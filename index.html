@@ -16,12 +16,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    /* Базовые настройки шрифта и тактильного отклика для мобильных устройств */
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
-    /* Плавное авторасширение текстовых полей без полос прокрутки */
     textarea.auto-expand {
       overflow-y: hidden;
       transition: height 0.14s ease;
@@ -324,19 +322,16 @@
             ></textarea>
           </div>
 
-          <!-- Пресеты заявок -->
           <div class="space-y-1">
             <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-500">Быстрые пресеты заявок</span>
             <div id="jobPresetsBar" class="flex flex-wrap gap-1.5"></div>
           </div>
 
-          <!-- Быстрые кнопки выбора услуги -->
           <div class="space-y-1 pt-2 border-t border-slate-100">
             <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-500">Быстрый выбор услуг</span>
             <div id="quickServicesBar" class="flex flex-wrap gap-2"></div>
           </div>
 
-          <!-- Выбор услуги и количества + кнопка «Подтвердить» -->
           <div class="bg-slate-50/90 border border-slate-200/90 rounded-2xl p-3.5 space-y-3">
             <div class="flex items-center justify-between gap-2">
               <span class="text-xs font-bold text-slate-700">Услуга и количество</span>
@@ -384,7 +379,6 @@
             </button>
           </div>
 
-          <!-- Динамически расширяющееся окошко выбранных позиций: сперва сумма, потом описание -->
           <div class="bg-slate-50/90 border border-slate-200/90 rounded-2xl p-3.5 space-y-2">
             <div class="flex items-center justify-between gap-2">
               <label for="jobSelectedItemsBox" class="text-xs font-bold text-slate-700 leading-tight">
@@ -407,7 +401,6 @@
             ></textarea>
           </div>
 
-          <!-- Блок оплаты -->
           <div class="bg-slate-50/90 border border-slate-200/90 rounded-2xl p-3.5 space-y-2.5">
             <div class="flex items-center justify-between gap-2 flex-wrap">
               <span class="text-xs font-bold text-slate-700">Оплата и расчёт</span>
@@ -448,7 +441,6 @@
             <input type="hidden" id="jobToAcc" value="" />
           </div>
 
-          <!-- Время окончания -->
           <div class="flex items-end gap-2.5 pt-0.5">
             <div class="flex-1">
               <label for="jobTime" class="block text-xs font-medium text-slate-600 mb-1">Время окончания</label>
@@ -477,7 +469,6 @@
           </button>
         </form>
 
-        <!-- Список заявок за день -->
         <div class="space-y-2.5">
           <div class="flex items-center justify-between px-1">
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Список заявок за день</h3>
@@ -509,7 +500,6 @@
           ></textarea>
         </div>
 
-        <!-- Архив прошлых отчётов (до 15 смен по кругу) -->
         <div id="reportArchiveContainer" class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs space-y-3">
           <div class="flex items-center justify-between gap-2">
             <div>
@@ -530,7 +520,6 @@
 
       <!-- ВКЛАДКА 4: НАСТРОЙКИ -->
       <section id="tab-settings" class="tab-panel hidden space-y-4">
-        <!-- Блок настройки Telegram-бота -->
         <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs space-y-3.5">
           <h2 class="text-sm font-bold text-slate-800">🤖 Настройки Telegram-бота</h2>
           <p class="text-xs text-slate-500 leading-relaxed">
@@ -567,6 +556,16 @@
             />
           </label>
 
+          <label class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 cursor-pointer">
+            <span class="text-xs font-semibold text-slate-700">Удалять старое и отправлять новое (звук/уведомление)</span>
+            <input
+              type="checkbox"
+              id="botRecreateNotifyCheckbox"
+              checked
+              class="w-4 h-4 rounded accent-blue-600"
+            />
+          </label>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
             <button
               type="button"
@@ -600,49 +599,8 @@
             </button>
           </div>
           <p id="botStatusHint" class="text-[11px] text-slate-500 break-words"></p>
-
-          <div class="pt-3 border-t border-slate-100 space-y-3">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Подробная инструкция по работе с ботом</h3>
-
-            <div class="space-y-1.5 text-xs text-slate-600 leading-relaxed">
-              <p class="font-semibold text-slate-800">1. Создание бота и получение Bot Token</p>
-              <ol class="list-decimal list-inside space-y-1 pl-1">
-                <li>Откройте в Telegram <span class="font-mono text-slate-800">@BotFather</span> и нажмите <span class="font-semibold text-slate-800">Запустить</span> / отправьте команду <span class="font-mono text-slate-800">/newbot</span>.</li>
-                <li>Укажите название бота (например, <span class="font-mono text-slate-800">Отчёты РМН</span>) и его username, заканчивающийся на <span class="font-mono text-slate-800">bot</span>.</li>
-                <li>Скопируйте выданный токен вида <span class="font-mono text-slate-800">1234567890:AAF...</span> и вставьте в поле <span class="font-semibold text-slate-800">Bot Token</span> выше. Никому не передавайте этот токен.</li>
-              </ol>
-            </div>
-
-            <div class="space-y-1.5 text-xs text-slate-600 leading-relaxed">
-              <p class="font-semibold text-slate-800">2. Подключение бота к группе, теме или каналу</p>
-              <ol class="list-decimal list-inside space-y-1 pl-1">
-                <li>Добавьте вашего бота в нужную группу/супергруппу или канал.</li>
-                <li>В настройках чата назначьте бота администратором с правом <span class="font-semibold text-slate-800">Публикация сообщений</span> и <span class="font-semibold text-slate-800">Редактирование сообщений</span> — без этого бот не сможет обновлять отчёт в течение смены.</li>
-                <li>Если в чате включены темы (форум), зайдите в нужную тему и отправьте любое сообщение.</li>
-              </ol>
-            </div>
-
-            <div class="space-y-1.5 text-xs text-slate-600 leading-relaxed">
-              <p class="font-semibold text-slate-800">3. Как указать цель: ссылка или Chat ID</p>
-              <ul class="list-disc list-inside space-y-1 pl-1">
-                <li><span class="font-semibold text-slate-800">По ссылке на сообщение:</span> зажмите нужное сообщение в чате/теме → <span class="font-semibold text-slate-800">Копировать ссылку</span> (например, <span class="font-mono text-slate-800">https://t.me/c/5707681826/2</span>). Приложение само определит Chat ID, номер ветки/темы и ID сообщения для обновления.</li>
-                <li><span class="font-semibold text-slate-800">По Chat ID:</span> узнайте ID через <span class="font-mono text-slate-800">@userinfobot</span> или <span class="font-mono text-slate-800">@getidsbot</span> (для групп/каналов обычно начинается с <span class="font-mono text-slate-800">-100...</span>) и вставьте в поле выше.</li>
-              </ul>
-            </div>
-
-            <div class="space-y-1.5 text-xs text-slate-600 leading-relaxed">
-              <p class="font-semibold text-slate-800">4. Автообновление, новый день и кнопки управления</p>
-              <ul class="list-disc list-inside space-y-1 pl-1">
-                <li><span class="font-semibold text-slate-800">Автоотправка:</span> при включённой галочке добавление, правка или удаление заявки сразу обновляет отчёт в боте.</li>
-                <li><span class="font-semibold text-slate-800">Кнопка «🤖 В бот» внизу:</span> отправляет или обновляет текущий отчёт вручную с любого экрана.</li>
-                <li><span class="font-semibold text-slate-800">Новый день (удерж. 3с):</span> сохраняет прошлый отчёт в архив (до 15 смен по кругу), сбрасывает ID прошлого сообщения и ставит флаг создания нового сообщения — первая отправка за новый день создаст свежий пост, а последующие в этот день будут редактировать уже его.</li>
-                <li><span class="font-semibold text-slate-800">«Отправить новым сообщением» / «Сбросить ID сообщения»:</span> используйте, если нужно начать новый отчёт в том же чате без запуска нового дня.</li>
-              </ul>
-            </div>
-          </div>
         </div>
 
-        <!-- Блок управления услугами, расходниками и ценами -->
         <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs space-y-3.5">
           <div class="flex items-center justify-between gap-2">
             <h2 class="text-sm font-bold text-slate-800">⚙️ Настройки услуг, расходников и цен</h2>
@@ -654,9 +612,6 @@
               Сбросить
             </button>
           </div>
-          <p class="text-xs text-slate-500">
-            Добавляйте, изменяйте или удаляйте услуги и расходники — они сразу появятся в быстрых кнопках и выборе на вкладке «Заявки».
-          </p>
 
           <form id="addServiceForm" class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
             <input
@@ -687,7 +642,6 @@
           <ul id="servicesListView" class="divide-y divide-slate-100 text-xs pt-1"></ul>
         </div>
 
-        <!-- Блок управления пользовательскими пресетами заявок -->
         <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs space-y-3.5">
           <div class="flex items-center justify-between gap-2">
             <h2 class="text-sm font-bold text-slate-800">⚡ Шаблоны (пресеты) заявок</h2>
@@ -699,9 +653,6 @@
               Сбросить
             </button>
           </div>
-          <p class="text-xs text-slate-500">
-            Создавайте свои быстрые шаблоны заявок: название кнопки, позиции (сперва сумма и ₽, затем описание — по одной на строку) и комментарий по умолчанию.
-          </p>
 
           <form id="addPresetForm" class="space-y-2.5 pt-1">
             <input
@@ -771,6 +722,7 @@
       const STORAGE_KEY = "pmh_full_project_state_v2";
       const ADDRESS_HISTORY_KEY = "pmh_recent_addresses_v1";
       const MAX_ARCHIVED_REPORTS = 15;
+      const NEW_DAY_HOLD_MS = 3000;
 
       const DEFAULT_SERVICES = [
         { id: "srv_iptv", name: "Настройка iptv", price: 180 },
@@ -779,7 +731,6 @@
         { id: "srv_bp12v", name: "Компенсация БП 12v", price: 250 }
       ];
 
-      // Готовые пресеты типовых заявок по умолчанию
       const DEFAULT_JOB_PRESETS = [
         {
           id: "preset_call_iptv",
@@ -801,7 +752,6 @@
         }
       ];
 
-      // Создаёт чистое начальное состояние приложения
       function createDefaultState() {
         return {
           activeTab: "jobs",
@@ -815,7 +765,8 @@
             chatId: "",
             lastMessageId: null,
             forceNewOnNextSend: false,
-            autoSend: true
+            autoSend: true,
+            recreateWithNotify: true
           },
           shift: {
             date: "",
@@ -844,7 +795,6 @@
       let newDayHoldStart = 0;
       let newDayTriggered = false;
       let deferredInstallPrompt = null;
-      const NEW_DAY_HOLD_MS = 3000;
 
       const els = {
         headerTodayBadge: document.getElementById("headerTodayBadge"),
@@ -914,6 +864,7 @@
         botTokenInput: document.getElementById("botTokenInput"),
         botChatIdInput: document.getElementById("botChatIdInput"),
         botAutoSendCheckbox: document.getElementById("botAutoSendCheckbox"),
+        botRecreateNotifyCheckbox: document.getElementById("botRecreateNotifyCheckbox"),
         btnSendViaBotApi: document.getElementById("btnSendViaBotApi"),
         btnSendNewBotMessage: document.getElementById("btnSendNewBotMessage"),
         btnResetBotMsgId: document.getElementById("btnResetBotMsgId"),
@@ -933,7 +884,6 @@
         footerTotalMoney: document.getElementById("footerTotalMoney")
       };
 
-      // Обновляет индикатор сегодняшней даты и дня недели в шапке
       function renderHeaderTodayBadge() {
         if (!els.headerTodayBadge) return;
         const now = new Date();
@@ -945,7 +895,6 @@
         els.headerTodayBadge.innerHTML = `<span class="block text-slate-900">${dd}.${mm}.${yyyy}</span><span class="block text-[10px] font-semibold text-slate-500 uppercase">${dayShort}</span>`;
       }
 
-      // Показывает верхний уведомляющий баннер с автоскрытием
       function showToast(message, type) {
         if (!els.toastBanner || !els.toastText) return;
         const tone = type || "info";
@@ -958,15 +907,12 @@
         els.toastBanner.className = `mx-4 mt-3 px-4 py-2.5 rounded-2xl text-xs font-medium flex items-center justify-between gap-2 shadow-sm border ${palette[tone] || palette.info}`;
         els.toastBanner.classList.remove("hidden");
 
-        if (toastTimeout) {
-          clearTimeout(toastTimeout);
-        }
+        if (toastTimeout) clearTimeout(toastTimeout);
         toastTimeout = setTimeout(() => {
           els.toastBanner.classList.add("hidden");
         }, 3400);
       }
 
-      // Собирает уникальные адреса из текущей смены и сохранённой истории
       function getRecentAddresses() {
         const fromJobs = Array.isArray(state.jobs)
           ? state.jobs.map((j) => (j && j.address ? String(j.address).trim() : "")).filter(Boolean)
@@ -995,7 +941,6 @@
         return merged.slice(0, 30);
       }
 
-      // Сохраняет использованный адрес в историю подсказок
       function rememberAddress(address) {
         const clean = String(address || "").trim();
         if (!clean) return;
@@ -1004,12 +949,11 @@
         try {
           localStorage.setItem(ADDRESS_HISTORY_KEY, JSON.stringify(next));
         } catch (err) {
-          // Игнорируем ошибку квоты хранилища
+          // Игнорируем ошибку квоты
         }
         renderAddressSuggestions();
       }
 
-      // Обновляет выпадающий список адресов для автоподстановки
       function renderAddressSuggestions() {
         if (!els.recentAddressesList) return;
         const list = getRecentAddresses();
@@ -1018,7 +962,6 @@
           .join("");
       }
 
-      // Рендерит элементы быстрого ввода: пресеты и кнопку повтора
       function renderOneHandHelpers() {
         const presetsList = getPresetsList();
         if (els.jobPresetsBar) {
@@ -1045,7 +988,6 @@
         renderAddressSuggestions();
       }
 
-      // Применяет выбранный пресет позиций и комментария, затем пересчитывает суммы
       function applyJobPreset(presetId) {
         const preset = getPresetsList().find((p) => p.id === presetId);
         if (!preset) return;
@@ -1071,12 +1013,8 @@
         }
 
         const totalItemsSum = parseSelectedItemsSum();
-        if (els.jobServices) {
-          els.jobServices.value = String(totalItemsSum);
-        }
-        if (els.jobFromAcc) {
-          els.jobFromAcc.value = "";
-        }
+        if (els.jobServices) els.jobServices.value = String(totalItemsSum);
+        if (els.jobFromAcc) els.jobFromAcc.value = "";
 
         const cashVal = parseNum(els.jobCashReceived ? els.jobCashReceived.value : 0);
         if (cashVal > 0 && els.jobToAcc) {
@@ -1087,7 +1025,6 @@
         showToast(`Применён шаблон: ${preset.label}`, "success");
       }
 
-      // Копирует последнюю заявку смены в форму для быстрого повтора
       function repeatLastJob() {
         if (!Array.isArray(state.jobs) || state.jobs.length === 0) {
           showToast("Нет сохранённых заявок для повтора", "warn");
@@ -1131,19 +1068,17 @@
         }
       }
 
-      // Безопасно формирует абсолютный URL относительно текущей страницы, если контекст позволяет
       function resolveSafeUrl(relativePath) {
         try {
           if (window.location && (window.location.protocol === "http:" || window.location.protocol === "https:")) {
             return new URL(relativePath, window.location.href).href;
           }
         } catch (err) {
-          // Игнорируем ошибку формирования URL в ограниченной песочнице
+          // Игнорируем ошибку URL
         }
         return relativePath;
       }
 
-      // Настраивает манифест PWA, иконку и Service Worker для офлайн-доступа
       function setupPwaSupport() {
         try {
           const uploadedIconFile = "7b5a71dd-d93c-43db-aa1d-e2a96061a882.png";
@@ -1152,12 +1087,8 @@
           const headerIconEl = document.getElementById("headerAppIcon");
           const headerIconFallback = document.getElementById("headerAppIconFallback");
           const showFallbackIcon = function () {
-            if (headerIconEl) {
-              headerIconEl.classList.add("hidden");
-            }
-            if (headerIconFallback) {
-              headerIconFallback.classList.remove("hidden");
-            }
+            if (headerIconEl) headerIconEl.classList.add("hidden");
+            if (headerIconFallback) headerIconFallback.classList.remove("hidden");
           };
 
           if (headerIconEl) {
@@ -1238,7 +1169,7 @@
             navigator.serviceWorker.register(swUrl, { scope: "./" }).catch(() => {});
           }
         } catch (err) {
-          // Не блокируем запуск интерфейса при ограничениях среды
+          // Не блокируем запуск интерфейса
         }
       }
 
@@ -1253,7 +1184,6 @@
         }
       }
 
-      // Преобразует произвольное значение в безопасное число
       function parseNum(val) {
         if (typeof val === "number") return Number.isFinite(val) ? val : 0;
         const cleaned = String(val || "").replace(/\s+/g, "").replace(",", ".");
@@ -1261,13 +1191,11 @@
         return Number.isFinite(num) ? num : 0;
       }
 
-      // Форматирует число для вывода в отчётах и интерфейсе
       function formatMoney(num) {
         const rounded = Math.round((parseNum(num) + Number.EPSILON) * 100) / 100;
         return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2).replace(".", ",");
       }
 
-      // Экранирует спецсимволы HTML
       function escapeHtml(str) {
         return String(str || "")
           .replace(/&/g, "&amp;")
@@ -1277,7 +1205,6 @@
           .replace(/'/g, "&#39;");
       }
 
-      // Возвращает текущую дату в формате ДД.ММ.ГГГГ
       function getTodayFormatted() {
         const now = new Date();
         const dd = String(now.getDate()).padStart(2, "0");
@@ -1286,7 +1213,6 @@
         return `${dd}.${mm}.${yyyy}`;
       }
 
-      // Возвращает текущее время в формате ЧЧ:ММ:СС
       function getNowTimeFormatted() {
         const now = new Date();
         const hh = String(now.getHours()).padStart(2, "0");
@@ -1295,7 +1221,6 @@
         return `${hh}:${mm}:${ss}`;
       }
 
-      // Возвращает актуальный список услуг/расходников
       function getServicesList() {
         if (!Array.isArray(state.services) || state.services.length === 0) {
           state.services = DEFAULT_SERVICES.map((s) => ({ ...s }));
@@ -1303,7 +1228,6 @@
         return state.services;
       }
 
-      // Возвращает актуальный список пользовательских пресетов заявок
       function getPresetsList() {
         if (!Array.isArray(state.presets)) {
           state.presets = DEFAULT_JOB_PRESETS.map((p) => ({ ...p, items: [...p.items] }));
@@ -1311,7 +1235,6 @@
         return state.presets;
       }
 
-      // Извлекает из строки позиции (сперва сумма и ₽, затем описание) название услуги и количество
       function parseServiceLineItem(line) {
         const clean = String(line || "").trim();
         if (!clean) return null;
@@ -1331,7 +1254,6 @@
         };
       }
 
-      // Синхронизирует суммы позиций и итоговую сумму в скобках пресетов по актуальному прайсу услуг
       function syncPresetsWithServices() {
         const services = getServicesList();
         const priceByName = new Map(
@@ -1385,7 +1307,6 @@
         return changed;
       }
 
-      // Парсит строки в окошке выбранных позиций (сперва сумма, потом описание) и возвращает общую сумму
       function parseSelectedItemsSum() {
         const raw = els.jobSelectedItemsBox ? els.jobSelectedItemsBox.value : "";
         const lines = String(raw || "").split(/\r?\n/);
@@ -1408,7 +1329,6 @@
         return Math.round((sum + Number.EPSILON) * 100) / 100;
       }
 
-      // Автоматически подстраивает высоту окошка выбранных позиций под его содержимое
       function resizeSelectedItemsBox() {
         const box = els.jobSelectedItemsBox;
         if (!box) return;
@@ -1417,7 +1337,6 @@
         box.style.height = `${Math.max(minHeight, box.scrollHeight)}px`;
       }
 
-      // Автоматически подстраивает высоту поля «Что сделано / комментарий» под его содержимое
       function resizeJobDescBox() {
         const box = els.jobDesc;
         if (!box) return;
@@ -1426,7 +1345,6 @@
         box.style.height = `${Math.max(minHeight, box.scrollHeight)}px`;
       }
 
-      // Обновляет предпросмотр расчёта суммы услуг и остатка «На счёт»
       function updatePaymentCalculationPreview() {
         const servicesSum = parseSelectedItemsSum();
         const cashReceived = parseNum(els.jobCashReceived ? els.jobCashReceived.value : 0);
@@ -1462,7 +1380,6 @@
         }
       }
 
-      // Записывает оплату наличными: если указано «Взято ₽», остаток сверх услуг переносит в «На счёт»
       function applyCashPayment() {
         const servicesSum = parseSelectedItemsSum();
         const cashReceived = parseNum(els.jobCashReceived ? els.jobCashReceived.value : 0);
@@ -1496,7 +1413,6 @@
         }
       }
 
-      // Записывает всю сумму выбранных позиций в оплату «со счёта»
       function applyAccountPayment() {
         const servicesSum = parseSelectedItemsSum();
         if (servicesSum <= 0) {
@@ -1511,7 +1427,6 @@
         showToast(`Оплата со счёта: ${formatMoney(servicesSum)} ₽`, "success");
       }
 
-      // Сохраняет состояние приложения в localStorage
       function saveState() {
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -1520,7 +1435,6 @@
         }
       }
 
-      // Загружает и нормализует сохранённое состояние из localStorage
       function loadState() {
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
@@ -1579,7 +1493,13 @@
             ...parsed,
             services: loadedServices,
             presets: loadedPresets,
-            bot: { ...def.bot, ...(parsed.bot || {}) },
+            bot: {
+              ...def.bot,
+              ...(parsed.bot || {}),
+              recreateWithNotify: parsed.bot && typeof parsed.bot.recreateWithNotify === "boolean"
+                ? parsed.bot.recreateWithNotify
+                : true
+            },
             shift: {
               ...def.shift,
               ...loadedShift,
@@ -1601,7 +1521,6 @@
         }
       }
 
-      // Переключает активную вкладку интерфейса
       function switchTab(tabName) {
         if (!els.tabPanels[tabName]) return;
         state.activeTab = tabName;
@@ -1634,7 +1553,6 @@
         saveState();
       }
 
-      // Вычисляет пробег за смену
       function computeMileage() {
         const startRaw = String(state.shift.startKm || "").trim();
         const endRaw = String(state.shift.endKm || "").trim();
@@ -1645,7 +1563,6 @@
         return diff > 0 ? diff : 0;
       }
 
-      // Собирает все заполненные заправки смены (основную и дополнительные)
       function getAllFuelsList() {
         const list = [];
         const mainType = String(state.shift.fuelType || "").trim();
@@ -1664,7 +1581,6 @@
         return list;
       }
 
-      // Рендерит дополнительные строки заправок на вкладке «Смена»
       function renderExtraFuels() {
         if (!els.extraFuelsContainer) return;
         const extras = Array.isArray(state.shift.extraFuels) ? state.shift.extraFuels : [];
@@ -1707,7 +1623,6 @@
         `).join("");
       }
 
-      // Добавляет новую дополнительную строку заправки
       function addExtraFuelRow() {
         if (!Array.isArray(state.shift.extraFuels)) {
           state.shift.extraFuels = [];
@@ -1722,7 +1637,6 @@
         renderReport();
       }
 
-      // Удаляет дополнительную строку заправки по идентификатору
       function removeExtraFuelRow(fuelId) {
         if (!Array.isArray(state.shift.extraFuels)) return;
         state.shift.extraFuels = state.shift.extraFuels.filter((f) => f.id !== fuelId);
@@ -1731,7 +1645,6 @@
         renderReport();
       }
 
-      // Вычисляет сводку финансов за смену
       function computeFinanceTotals() {
         let fromAccountTotal = 0;
         let servicesCashTotal = 0;
@@ -1752,7 +1665,6 @@
         };
       }
 
-      // Формирует итоговый текст отчёта за смену
       function buildReportText() {
         const s = state.shift;
         const mileage = computeMileage();
@@ -1831,32 +1743,20 @@
         return lines.join("\n");
       }
 
-      // Рендерит текстовое поле отчёта и счётчики в шапке/подвале
       function renderReport() {
         const text = buildReportText();
         const fin = computeFinanceTotals();
         const mileage = computeMileage();
 
-        if (els.reportOutput) {
-          els.reportOutput.value = text;
-        }
-        if (els.jobsCountBadge) {
-          els.jobsCountBadge.textContent = String(state.jobs.length);
-        }
-        if (els.jobsTotalMini) {
-          els.jobsTotalMini.textContent = `Итого: ${formatMoney(fin.grandTotal)} ₽`;
-        }
-        if (els.footerTotalMoney) {
-          els.footerTotalMoney.textContent = `${formatMoney(fin.grandTotal)} ₽`;
-        }
-        if (els.dayMileageBadge) {
-          els.dayMileageBadge.textContent = `Пробег: ${formatMoney(mileage)} км`;
-        }
+        if (els.reportOutput) els.reportOutput.value = text;
+        if (els.jobsCountBadge) els.jobsCountBadge.textContent = String(state.jobs.length);
+        if (els.jobsTotalMini) els.jobsTotalMini.textContent = `Итого: ${formatMoney(fin.grandTotal)} ₽`;
+        if (els.footerTotalMoney) els.footerTotalMoney.textContent = `${formatMoney(fin.grandTotal)} ₽`;
+        if (els.dayMileageBadge) els.dayMileageBadge.textContent = `Пробег: ${formatMoney(mileage)} км`;
         renderOneHandHelpers();
         renderReportArchive();
       }
 
-      // Сохраняет текущий отчёт смены в кольцевой архив (до 15 записей с перезаписью по кругу)
       function archiveCurrentShiftReport() {
         const hasShiftData = Boolean(
           (state.shift.date && state.shift.date.trim()) ||
@@ -1869,10 +1769,7 @@
         );
 
         if (!hasShiftData) return false;
-
-        if (!Array.isArray(state.reportArchive)) {
-          state.reportArchive = [];
-        }
+        if (!Array.isArray(state.reportArchive)) state.reportArchive = [];
 
         const fin = computeFinanceTotals();
         const now = new Date();
@@ -1900,7 +1797,6 @@
         return true;
       }
 
-      // Рендерит список прошлых отчётов в свёрнутом виде с раскрытием по нажатию
       function renderReportArchive() {
         if (!els.reportArchiveList || !els.archiveCountBadge) return;
         const archive = Array.isArray(state.reportArchive) ? state.reportArchive : [];
@@ -1961,7 +1857,6 @@
         }).join("");
       }
 
-      // Копирует текст в буфер обмена
       async function copyTextToClipboard(text, successMsg) {
         try {
           if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1970,7 +1865,7 @@
             return;
           }
         } catch (err) {
-          // Используем запасной способ через временное поле
+          // Запасной способ
         }
 
         const temp = document.createElement("textarea");
@@ -1990,7 +1885,6 @@
         }
       }
 
-      // Разбирает ссылку на сообщение/чат Telegram или Chat ID
       function parseTelegramTarget(rawInput) {
         const trimmed = String(rawInput || "").trim();
         if (!trimmed) {
@@ -2006,15 +1900,6 @@
             chatId: `-100${internalChannelId}`,
             messageId: thirdNum || secondNum,
             messageThreadId: thirdNum ? secondNum : null
-          };
-        }
-
-        const topicLinkMatch = trimmed.match(/^(?:https?:\/\/)?t\.me\/c\/(\d+)\/(\d+)(?:[/?#].*)?$/i);
-        if (topicLinkMatch) {
-          return {
-            chatId: `-100${topicLinkMatch[1]}`,
-            messageId: null,
-            messageThreadId: parseInt(topicLinkMatch[2], 10)
           };
         }
 
@@ -2066,6 +1951,9 @@
         if (els.botAutoSendCheckbox) {
           state.bot.autoSend = Boolean(els.botAutoSendCheckbox.checked);
         }
+        if (els.botRecreateNotifyCheckbox) {
+          state.bot.recreateWithNotify = Boolean(els.botRecreateNotifyCheckbox.checked);
+        }
       }
 
       function renderBotStatusHint(customText) {
@@ -2077,16 +1965,36 @@
         const parsed = parseTelegramTarget(state.bot.chatId);
         const targetLabel = parsed.chatId || "не задан";
         const msgId = state.bot.lastMessageId || parsed.messageId;
+        const modeText = state.bot.recreateWithNotify !== false
+          ? "Режим: удалять старое и отправлять новое (с уведомлением)."
+          : "Режим: редактировать существующее сообщение.";
         if (state.bot.forceNewOnNextSend) {
-          els.botStatusHint.textContent = `Цель: ${targetLabel}. Следующая отправка создаст новое сообщение в чате.`;
+          els.botStatusHint.textContent = `Цель: ${targetLabel}. Следующая отправка создаст новое сообщение в чате. ${modeText}`;
         } else if (msgId) {
-          els.botStatusHint.textContent = `Цель: ${targetLabel} · ID сообщения для обновления: #${msgId}.`;
+          els.botStatusHint.textContent = `Цель: ${targetLabel} · Предыдущий ID: #${msgId}. ${modeText}`;
         } else {
-          els.botStatusHint.textContent = `Цель: ${targetLabel}. При первой отправке бот создаст сообщение и запомнит его ID для правок.`;
+          els.botStatusHint.textContent = `Цель: ${targetLabel}. При первой отправке бот создаст сообщение и запомнит его ID. ${modeText}`;
         }
       }
 
-      // Отправляет новый отчёт или редактирует существующее сообщение через Telegram Bot API
+      async function deleteTelegramMessageSafely(token, chatId, messageId) {
+        if (!token || !chatId || !messageId) return false;
+        try {
+          const res = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/deleteMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chat_id: chatId,
+              message_id: messageId
+            })
+          });
+          const data = await res.json();
+          return Boolean(res.ok && data && data.ok);
+        } catch (err) {
+          return false;
+        }
+      }
+
       async function sendReportViaBotApi(options) {
         const opts = options || {};
         const silent = Boolean(opts.silent);
@@ -2109,10 +2017,11 @@
 
         const text = buildReportText();
         const shouldCreateNew = forceNew || Boolean(state.bot.forceNewOnNextSend);
+        const recreateWithNotify = state.bot.recreateWithNotify !== false;
         const existingMsgId = shouldCreateNew ? null : (state.bot.lastMessageId || parsedTarget.messageId);
 
         try {
-          if (existingMsgId) {
+          if (existingMsgId && !recreateWithNotify) {
             const editRes = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/editMessageText`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -2134,18 +2043,10 @@
               }
               return true;
             }
+          }
 
-            const errDesc = String((editData && editData.description) || "");
-            const isMessageUnmodified = errDesc.toLowerCase().indexOf("message is not modified") !== -1;
-            if (isMessageUnmodified) {
-              state.bot.forceNewOnNextSend = false;
-              saveState();
-              renderBotStatusHint(`Сообщение #${existingMsgId} уже актуально.`);
-              if (!silent) {
-                showToast("Изменений для обновления нет", "info");
-              }
-              return true;
-            }
+          if (existingMsgId && recreateWithNotify) {
+            await deleteTelegramMessageSafely(token, chatId, existingMsgId);
           }
 
           const sendPayload = {
@@ -2181,11 +2082,11 @@
           saveState();
           renderBotStatusHint(
             newMsgId
-              ? `Отправлено новое сообщение #${newMsgId} в чат ${chatId}.`
+              ? `Отправлено сообщение #${newMsgId} в чат ${chatId}.`
               : `Отчёт отправлен в чат ${chatId}.`
           );
           if (!silent) {
-            showToast(existingMsgId ? "Создано новое сообщение с отчётом" : "Отчёт отправлен в Telegram-бот", "success");
+            showToast(existingMsgId && recreateWithNotify ? "Отчёт переотправлен с уведомлением" : "Отчёт отправлен в Telegram-бот", "success");
           }
           return true;
         } catch (err) {
@@ -2197,7 +2098,6 @@
         }
       }
 
-      // Автоматически отправляет/обновляет отчёт при изменении заявок, если включена автоотправка
       function triggerAutoBotSyncIfEnabled() {
         syncBotInputsToState();
         saveState();
@@ -2206,7 +2106,6 @@
         sendReportViaBotApi({ silent: true });
       }
 
-      // Открывает Telegram с готовым текстом отчёта
       function openReportInTelegram() {
         const text = buildReportText();
         copyTextToClipboard(text, "Отчёт скопирован — вставьте его в нужный чат Telegram");
@@ -2214,7 +2113,6 @@
         window.open(url, "_blank", "noopener,noreferrer");
       }
 
-      // Обновляет формулу расчёта выбранной услуги и количества
       function updateServiceFormula() {
         const services = getServicesList();
         const selected = services.find((s) => s.id === state.selectedServiceId) || services[0];
@@ -2230,7 +2128,6 @@
         }
       }
 
-      // Рендерит быстрые кнопки услуг и выпадающий список выбора услуги
       function renderServiceSelector() {
         const services = getServicesList();
         if (!services.some((s) => s.id === state.selectedServiceId)) {
@@ -2270,7 +2167,6 @@
         updateServiceFormula();
       }
 
-      // Подтверждает выбранную услугу и количество, добавляя строку (сперва сумма, потом описание) в окошко позиций
       function confirmSelectedService() {
         const services = getServicesList();
         const selected = services.find((s) => s.id === state.selectedServiceId) || services[0];
@@ -2290,12 +2186,8 @@
         }
 
         const totalItemsSum = parseSelectedItemsSum();
-        if (els.jobServices) {
-          els.jobServices.value = String(totalItemsSum);
-        }
-        if (els.jobFromAcc) {
-          els.jobFromAcc.value = "";
-        }
+        if (els.jobServices) els.jobServices.value = String(totalItemsSum);
+        if (els.jobFromAcc) els.jobFromAcc.value = "";
 
         const cashVal = parseNum(els.jobCashReceived ? els.jobCashReceived.value : 0);
         if (cashVal > 0 && els.jobToAcc) {
@@ -2307,7 +2199,6 @@
         showToast(`Добавлено: ${formattedLine}`, "success");
       }
 
-      // Рендерит список услуг и расходников в настройках с возможностью редактирования и удаления
       function renderServicesSettings() {
         if (!els.servicesListView) return;
         const services = getServicesList();
@@ -2384,7 +2275,6 @@
           .join("");
       }
 
-      // Рендерит список пользовательских пресетов в настройках
       function renderPresetsSettings() {
         if (!els.presetsListView) return;
         const presets = getPresetsList();
@@ -2476,7 +2366,6 @@
           .join("");
       }
 
-      // Сбрасывает форму заявки в исходное состояние
       function resetJobForm() {
         state.editingJobId = null;
         if (els.jobForm) els.jobForm.reset();
@@ -2488,26 +2377,17 @@
           els.jobSelectedItemsBox.value = "";
           resizeSelectedItemsBox();
         }
-        if (els.jobDesc) {
-          resizeJobDescBox();
-        }
+        if (els.jobDesc) resizeJobDescBox();
         state.serviceQty = 1;
         if (els.serviceQty) els.serviceQty.value = "1";
         updateServiceFormula();
         updatePaymentCalculationPreview();
 
-        if (els.jobFormTitle) {
-          els.jobFormTitle.innerHTML = "<span>➕</span><span>Новая заявка</span>";
-        }
-        if (els.btnSaveJob) {
-          els.btnSaveJob.textContent = "+ Добавить заявку в список";
-        }
-        if (els.btnCancelEdit) {
-          els.btnCancelEdit.classList.add("hidden");
-        }
+        if (els.jobFormTitle) els.jobFormTitle.innerHTML = "<span>➕</span><span>Новая заявка</span>";
+        if (els.btnSaveJob) els.btnSaveJob.textContent = "+ Добавить заявку в список";
+        if (els.btnCancelEdit) els.btnCancelEdit.classList.add("hidden");
       }
 
-      // Загружает выбранную заявку в форму для редактирования
       function startEditJob(jobId) {
         const job = state.jobs.find((j) => j.id === jobId);
         if (!job) return;
@@ -2533,22 +2413,15 @@
         if (els.jobTime) els.jobTime.value = job.time || "";
         updatePaymentCalculationPreview();
 
-        if (els.jobFormTitle) {
-          els.jobFormTitle.innerHTML = "<span>✏️</span><span>Редактирование заявки</span>";
-        }
-        if (els.btnSaveJob) {
-          els.btnSaveJob.textContent = "💾 Сохранить изменения";
-        }
-        if (els.btnCancelEdit) {
-          els.btnCancelEdit.classList.remove("hidden");
-        }
+        if (els.jobFormTitle) els.jobFormTitle.innerHTML = "<span>✏️</span><span>Редактирование заявки</span>";
+        if (els.btnSaveJob) els.btnSaveJob.textContent = "💾 Сохранить изменения";
+        if (els.btnCancelEdit) els.btnCancelEdit.classList.remove("hidden");
 
         switchTab("jobs");
         if (els.jobAddress) els.jobAddress.focus();
         showToast("Заявка загружена для редактирования", "info");
       }
 
-      // Удаляет заявку из списка
       function deleteJob(jobId) {
         state.jobs = state.jobs.filter((j) => j.id !== jobId);
         if (state.editingJobId === jobId) {
@@ -2560,7 +2433,6 @@
         showToast("Заявка удалена", "warn");
       }
 
-      // Рендерит карточки заявок за смену
       function renderJobsList() {
         if (!els.jobsListContainer) return;
         if (!state.jobs.length) {
@@ -2641,7 +2513,6 @@
           .join("");
       }
 
-      // Обновляет список заявок и итоговые суммы
       function renderJobsUI() {
         renderJobsList();
         const fin = computeFinanceTotals();
@@ -2651,7 +2522,6 @@
         renderOneHandHelpers();
       }
 
-      // Заполняет поля формы смены и настроек из состояния
       function hydrateFormInputs() {
         renderHeaderTodayBadge();
         if (els.inputDate) els.inputDate.value = state.shift.date || "";
@@ -2667,6 +2537,7 @@
         if (els.botTokenInput) els.botTokenInput.value = state.bot.token || "";
         if (els.botChatIdInput) els.botChatIdInput.value = state.bot.chatId || "";
         if (els.botAutoSendCheckbox) els.botAutoSendCheckbox.checked = state.bot.autoSend !== false;
+        if (els.botRecreateNotifyCheckbox) els.botRecreateNotifyCheckbox.checked = state.bot.recreateWithNotify !== false;
         renderBotStatusHint();
 
         renderServiceSelector();
@@ -2678,7 +2549,6 @@
         resizeJobDescBox();
       }
 
-      // Сбрасывает визуальный прогресс удержания кнопки «Новый день»
       function resetNewDayHoldVisual() {
         if (newDayHoldTimer) {
           clearTimeout(newDayHoldTimer);
@@ -2689,15 +2559,10 @@
           newDayRafId = null;
         }
         newDayHoldStart = 0;
-        if (els.newDayProgressBar) {
-          els.newDayProgressBar.style.width = "0%";
-        }
-        if (els.newDayBtnLabel) {
-          els.newDayBtnLabel.textContent = "Новый день (удерж. 3с)";
-        }
+        if (els.newDayProgressBar) els.newDayProgressBar.style.width = "0%";
+        if (els.newDayBtnLabel) els.newDayBtnLabel.textContent = "Новый день (удерж. 3с)";
       }
 
-      // Запускает отсчёт 3 секунд при удержании кнопки «Новый день»
       function startNewDayHold() {
         if (newDayHoldTimer) return;
         newDayTriggered = false;
@@ -2707,13 +2572,9 @@
           if (!newDayHoldStart) return;
           const elapsed = Date.now() - newDayHoldStart;
           const pct = Math.min(100, (elapsed / NEW_DAY_HOLD_MS) * 100);
-          if (els.newDayProgressBar) {
-            els.newDayProgressBar.style.width = `${pct}%`;
-          }
+          if (els.newDayProgressBar) els.newDayProgressBar.style.width = `${pct}%`;
           const leftSec = Math.max(0.1, ((NEW_DAY_HOLD_MS - elapsed) / 1000)).toFixed(1);
-          if (els.newDayBtnLabel) {
-            els.newDayBtnLabel.textContent = `Удерживайте (${leftSec}с)...`;
-          }
+          if (els.newDayBtnLabel) els.newDayBtnLabel.textContent = `Удерживайте (${leftSec}с)...`;
           if (pct < 100 && newDayHoldStart) {
             newDayRafId = requestAnimationFrame(stepProgress);
           }
@@ -2728,7 +2589,6 @@
         }, NEW_DAY_HOLD_MS);
       }
 
-      // Отменяет запуск «Нового дня», если кнопку отпустили раньше 3 секунд
       function cancelNewDayHold(showHint) {
         if (!newDayHoldTimer && !newDayRafId) return;
         resetNewDayHoldVisual();
@@ -2737,7 +2597,6 @@
         }
       }
 
-      // Открывает новый день: сохраняет отчёт прошлой смены в архив (до 15 по кругу), очищает заявки и пробег, сохраняя бригаду и авто
       function startNewDay() {
         const wasArchived = archiveCurrentShiftReport();
         const today = getTodayFormatted();
@@ -2779,7 +2638,6 @@
         );
       }
 
-      // Навешивает обработчики событий на элементы интерфейса
       function bindEvents() {
         if (els.toastClose) {
           els.toastClose.addEventListener("click", () => {
@@ -2815,7 +2673,7 @@
             try {
               await deferredInstallPrompt.userChoice;
             } catch (err) {
-              // Игнорируем отмену диалога установки
+              // Игнорируем отмену
             }
             deferredInstallPrompt = null;
             els.btnInstallPwaHeader.classList.add("hidden");
@@ -3140,6 +2998,20 @@
           });
         }
 
+        if (els.botRecreateNotifyCheckbox) {
+          els.botRecreateNotifyCheckbox.addEventListener("change", () => {
+            syncBotInputsToState();
+            renderBotStatusHint();
+            saveState();
+            showToast(
+              state.bot.recreateWithNotify !== false
+                ? "При обновлении старое удаляется и отправляется новое с уведомлением"
+                : "При обновлении используется тихое редактирование",
+              "info"
+            );
+          });
+        }
+
         if (els.btnSendViaBotApi) {
           els.btnSendViaBotApi.addEventListener("click", () => {
             sendReportViaBotApi({ silent: false });
@@ -3407,7 +3279,6 @@
         });
       }
 
-      // Инициализирует приложение при загрузке страницы
       function init() {
         setupPwaSupport();
         loadState();

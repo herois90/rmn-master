@@ -286,9 +286,9 @@
             <label for="jobDesc" class="block text-xs font-medium text-slate-600 mb-1">Что сделано / комментарий</label>
             <textarea
               id="jobDesc"
-              rows="2"
+              rows="4"
               placeholder="настройка роутера, замена БП, вне зоны..."
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none text-sm resize-none"
+              class="auto-expand w-full min-h-[7rem] px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none text-sm resize-none"
             ></textarea>
           </div>
 
@@ -1045,6 +1045,14 @@
         els.jobSelectedItemsBox.style.height = `${nextHeight}px`;
       }
 
+      function resizeJobDescBox() {
+        if (!els.jobDesc) return;
+        els.jobDesc.style.height = "auto";
+        const minHeight = 112;
+        const nextHeight = Math.max(minHeight, els.jobDesc.scrollHeight + 4);
+        els.jobDesc.style.height = `${nextHeight}px`;
+      }
+
       function parseSelectedItemsSum() {
         if (!els.jobSelectedItemsBox) return 0;
         const raw = els.jobSelectedItemsBox.value || "";
@@ -1686,6 +1694,10 @@
       function resetJobForm() {
         state.editingJobId = null;
         if (els.jobForm) els.jobForm.reset();
+        if (els.jobDesc) {
+          els.jobDesc.value = "";
+          resizeJobDescBox();
+        }
         if (els.jobSelectedItemsBox) {
           els.jobSelectedItemsBox.value = "";
           resizeSelectedItemsBox();
@@ -2018,6 +2030,10 @@
           });
         }
 
+        if (els.jobDesc) {
+          els.jobDesc.addEventListener("input", resizeJobDescBox);
+        }
+
         if (els.jobCashReceived) {
           els.jobCashReceived.addEventListener("input", () => {
             const servicesVal = getCurrentServicesAmount();
@@ -2113,6 +2129,7 @@
               state.editingJobId = target.id;
               els.jobAddress.value = target.address || "";
               els.jobDesc.value = target.description || "";
+              resizeJobDescBox();
               if (els.jobSelectedItemsBox) {
                 els.jobSelectedItemsBox.value = target.selectedItems || "";
                 resizeSelectedItemsBox();
@@ -2338,6 +2355,7 @@
         renderBotSettingsUI();
         renderJobsUI();
         renderReportUI();
+        resizeJobDescBox();
         resizeSelectedItemsBox();
         updatePaymentCalculationPreview();
         setActiveTab(state.activeTab || "jobs");

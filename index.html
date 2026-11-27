@@ -16,10 +16,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
+    /* Базовые настройки шрифта и тактильного отклика для мобильных устройств */
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
+    /* Плавное авторасширение текстовых полей без полос прокрутки */
     textarea.auto-expand {
       overflow-y: hidden;
       transition: height 0.14s ease;
@@ -32,13 +34,31 @@
     <!-- Шапка и навигация по вкладкам -->
     <header class="bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-20">
       <div class="flex items-start gap-2.5">
-        <div class="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0 mt-0.5">
-          📡
+        <div id="headerAppIconWrap" class="w-10 h-10 rounded-2xl overflow-hidden bg-blue-600 flex items-center justify-center shadow-sm shrink-0 mt-0.5 border border-blue-700/20 text-white">
+          <img
+            id="headerAppIcon"
+            src="7b5a71dd-d93c-43db-aa1d-e2a96061a882.png"
+            alt=""
+            class="w-full h-full object-cover"
+          />
+          <svg id="headerAppIconFallback" class="hidden w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <circle cx="12" cy="20" r="1.5" fill="currentColor" stroke="none"></circle>
+          </svg>
         </div>
         <div class="min-w-0 flex-1 space-y-1.5">
-          <div>
-            <h1 class="text-base font-bold text-slate-900 leading-snug break-words">РМН мастер by Горыныч</h1>
-            <p class="text-xs text-slate-500 font-medium truncate">Локальное сохранение активно</p>
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <h1 class="text-base font-bold text-slate-900 leading-snug break-words">РМН мастер by Горыныч</h1>
+              <p class="text-xs text-slate-500 font-medium truncate">Локальное сохранение активно</p>
+            </div>
+            <span
+              id="headerTodayBadge"
+              class="px-2.5 py-1 rounded-xl bg-slate-100 border border-slate-200/80 text-[11px] font-bold text-slate-700 shrink-0 text-right leading-tight"
+              title="Сегодняшняя календарная дата"
+            ></span>
           </div>
           <div class="flex flex-wrap items-center gap-1.5">
             <button
@@ -132,7 +152,7 @@
               <input
                 type="text"
                 id="inputDate"
-                placeholder="16.06.2026"
+                placeholder="27.11.2026"
                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none text-sm"
               />
             </div>
@@ -273,13 +293,25 @@
 
           <div>
             <label for="jobAddress" class="block text-xs font-medium text-slate-600 mb-1">Адрес / район заявки *</label>
-            <input
-              type="text"
-              id="jobAddress"
-              placeholder="например, Красный Луч улица Чкалова 55"
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none text-sm"
-              required
-            />
+            <div class="flex items-center gap-2">
+              <input
+                type="text"
+                id="jobAddress"
+                list="recentAddressesList"
+                placeholder="например, Красный Луч улица Чкалова 55"
+                class="flex-1 min-w-0 px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none text-sm"
+                required
+              />
+              <button
+                type="button"
+                id="btnRepeatLastJob"
+                class="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 text-xs font-semibold transition shrink-0"
+                title="Повторить последнюю заявку"
+              >
+                🔁 Повтор
+              </button>
+            </div>
+            <datalist id="recentAddressesList"></datalist>
           </div>
 
           <div>
@@ -292,8 +324,17 @@
             ></textarea>
           </div>
 
+          <!-- Пресеты заявок -->
+          <div class="space-y-1">
+            <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-500">Быстрые пресеты заявок</span>
+            <div id="jobPresetsBar" class="flex flex-wrap gap-1.5"></div>
+          </div>
+
           <!-- Быстрые кнопки выбора услуги -->
-          <div id="quickServicesBar" class="flex flex-wrap gap-2"></div>
+          <div class="space-y-1 pt-2 border-t border-slate-100">
+            <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-500">Быстрый выбор услуг</span>
+            <div id="quickServicesBar" class="flex flex-wrap gap-2"></div>
+          </div>
 
           <!-- Выбор услуги и количества + кнопка «Подтвердить» -->
           <div class="bg-slate-50/90 border border-slate-200/90 rounded-2xl p-3.5 space-y-3">
@@ -467,6 +508,24 @@
             class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs leading-relaxed text-slate-800 font-mono focus:outline-none"
           ></textarea>
         </div>
+
+        <!-- Архив прошлых отчётов (до 15 смен по кругу) -->
+        <div id="reportArchiveContainer" class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <h2 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                <span>🗂</span>
+                <span>Архив прошлых отчётов</span>
+              </h2>
+              <p class="text-[11px] text-slate-500">Хранит до 15 прошлых смен и перезаписывает по кругу. Нажмите, чтобы развернуть.</p>
+            </div>
+            <span id="archiveCountBadge" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 shrink-0">
+              0 / 15
+            </span>
+          </div>
+
+          <div id="reportArchiveList" class="space-y-2"></div>
+        </div>
       </section>
 
       <!-- ВКЛАДКА 4: НАСТРОЙКИ -->
@@ -576,7 +635,7 @@
               <ul class="list-disc list-inside space-y-1 pl-1">
                 <li><span class="font-semibold text-slate-800">Автоотправка:</span> при включённой галочке добавление, правка или удаление заявки сразу обновляет отчёт в боте.</li>
                 <li><span class="font-semibold text-slate-800">Кнопка «🤖 В бот» внизу:</span> отправляет или обновляет текущий отчёт вручную с любого экрана.</li>
-                <li><span class="font-semibold text-slate-800">Новый день (удерж. 3с):</span> сбрасывает ID прошлого сообщения и ставит флаг создания нового сообщения — первая отправка за новый день создаст свежий пост, а последующие в этот день будут редактировать уже его.</li>
+                <li><span class="font-semibold text-slate-800">Новый день (удерж. 3с):</span> сохраняет прошлый отчёт в архив (до 15 смен по кругу), сбрасывает ID прошлого сообщения и ставит флаг создания нового сообщения — первая отправка за новый день создаст свежий пост, а последующие в этот день будут редактировать уже его.</li>
                 <li><span class="font-semibold text-slate-800">«Отправить новым сообщением» / «Сбросить ID сообщения»:</span> используйте, если нужно начать новый отчёт в том же чате без запуска нового дня.</li>
               </ul>
             </div>
@@ -627,6 +686,54 @@
 
           <ul id="servicesListView" class="divide-y divide-slate-100 text-xs pt-1"></ul>
         </div>
+
+        <!-- Блок управления пользовательскими пресетами заявок -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs space-y-3.5">
+          <div class="flex items-center justify-between gap-2">
+            <h2 class="text-sm font-bold text-slate-800">⚡ Шаблоны (пресеты) заявок</h2>
+            <button
+              type="button"
+              id="btnResetDefaultPresets"
+              class="text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-xl transition"
+            >
+              Сбросить
+            </button>
+          </div>
+          <p class="text-xs text-slate-500">
+            Создавайте свои быстрые шаблоны заявок: название кнопки, позиции (сперва сумма и ₽, затем описание — по одной на строку) и комментарий по умолчанию.
+          </p>
+
+          <form id="addPresetForm" class="space-y-2.5 pt-1">
+            <input
+              type="text"
+              id="newPresetLabel"
+              placeholder="Название кнопки, например: Вызов + IPTV (360 ₽)"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none text-xs sm:text-sm"
+            />
+            <textarea
+              id="newPresetItems"
+              rows="2"
+              placeholder="Позиции (каждая с новой строки):&#10;180 ₽ — Вызов&#10;180 ₽ — Настройка iptv"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none text-xs leading-relaxed"
+            ></textarea>
+            <div class="flex gap-2">
+              <input
+                type="text"
+                id="newPresetComment"
+                placeholder="Комментарий по умолчанию (необязательно)"
+                class="flex-1 min-w-0 px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none text-xs sm:text-sm"
+              />
+              <button
+                type="submit"
+                class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shrink-0 transition"
+              >
+                + Добавить
+              </button>
+            </div>
+          </form>
+
+          <ul id="presetsListView" class="divide-y divide-slate-100 text-xs pt-1"></ul>
+        </div>
       </section>
     </main>
 
@@ -662,6 +769,8 @@
       "use strict";
 
       const STORAGE_KEY = "pmh_full_project_state_v2";
+      const ADDRESS_HISTORY_KEY = "pmh_recent_addresses_v1";
+      const MAX_ARCHIVED_REPORTS = 15;
 
       const DEFAULT_SERVICES = [
         { id: "srv_iptv", name: "Настройка iptv", price: 180 },
@@ -670,17 +779,37 @@
         { id: "srv_bp12v", name: "Компенсация БП 12v", price: 250 }
       ];
 
-      const createDefaultState = () => {
-        const now = new Date();
-        const dd = String(now.getDate()).padStart(2, "0");
-        const mm = String(now.getMonth() + 1).padStart(2, "0");
-        const yyyy = now.getFullYear();
+      // Готовые пресеты типовых заявок по умолчанию
+      const DEFAULT_JOB_PRESETS = [
+        {
+          id: "preset_call_iptv",
+          label: "Вызов + IPTV (360 ₽)",
+          items: ["180 ₽ — Вызов", "180 ₽ — Настройка iptv"],
+          comment: "Вызов и настройка IPTV"
+        },
+        {
+          id: "preset_call_bp",
+          label: "Вызов + БП 12v (430 ₽)",
+          items: ["180 ₽ — Вызов", "250 ₽ — Компенсация БП 12v"],
+          comment: "Замена БП 12v"
+        },
+        {
+          id: "preset_fttx_30",
+          label: "ФТТХ сталь × 30 (240 ₽)",
+          items: ["240 ₽ — фттх сталь × 30"],
+          comment: "Прокладка кабеля"
+        }
+      ];
+
+      // Создаёт чистое начальное состояние приложения
+      function createDefaultState() {
         return {
           activeTab: "jobs",
+          selectedServiceId: "srv_iptv",
+          serviceQty: 1,
           editingJobId: null,
           services: DEFAULT_SERVICES.map((s) => ({ ...s })),
-          selectedServiceId: DEFAULT_SERVICES[0].id,
-          serviceQty: 1,
+          presets: DEFAULT_JOB_PRESETS.map((p) => ({ ...p, items: [...p.items] })),
           bot: {
             token: "",
             chatId: "",
@@ -689,9 +818,9 @@
             autoSend: true
           },
           shift: {
-            date: `${dd}.${mm}.${yyyy}`,
-            manager: "Ишков Н.",
-            installers: "Горыныч КЛ Азисов",
+            date: "",
+            manager: "",
+            installers: "",
             carNumber: "",
             startKm: "",
             endKm: "",
@@ -699,13 +828,17 @@
             fuelValue: "",
             extraFuels: []
           },
-          jobs: []
+          jobs: [],
+          reportArchive: [],
+          archiveRingCursor: 0
         };
-      };
+      }
 
       let state = createDefaultState();
       let toastTimeout = null;
       let editingServiceId = null;
+      let editingPresetId = null;
+      let expandedArchiveId = null;
       let newDayHoldTimer = null;
       let newDayRafId = null;
       let newDayHoldStart = 0;
@@ -714,6 +847,7 @@
       const NEW_DAY_HOLD_MS = 3000;
 
       const els = {
+        headerTodayBadge: document.getElementById("headerTodayBadge"),
         btnNewDay: document.getElementById("btnNewDay"),
         btnInstallPwaHeader: document.getElementById("btnInstallPwaHeader"),
         newDayProgressBar: document.getElementById("newDayProgressBar"),
@@ -746,7 +880,10 @@
         btnCancelEdit: document.getElementById("btnCancelEdit"),
         btnSaveJob: document.getElementById("btnSaveJob"),
         jobAddress: document.getElementById("jobAddress"),
+        recentAddressesList: document.getElementById("recentAddressesList"),
+        btnRepeatLastJob: document.getElementById("btnRepeatLastJob"),
         jobDesc: document.getElementById("jobDesc"),
+        jobPresetsBar: document.getElementById("jobPresetsBar"),
         quickServicesBar: document.getElementById("quickServicesBar"),
         serviceCalcFormula: document.getElementById("serviceCalcFormula"),
         serviceSelect: document.getElementById("serviceSelect"),
@@ -765,11 +902,15 @@
         jobToAcc: document.getElementById("jobToAcc"),
         jobTime: document.getElementById("jobTime"),
         btnNowTime: document.getElementById("btnNowTime"),
-        jobsListContainer: document.getElementById("jobsListContainer"),
         jobsCountBadge: document.getElementById("jobsCountBadge"),
         jobsTotalMini: document.getElementById("jobsTotalMini"),
+        jobsListContainer: document.getElementById("jobsListContainer"),
         reportOutput: document.getElementById("reportOutput"),
+        archiveCountBadge: document.getElementById("archiveCountBadge"),
+        reportArchiveList: document.getElementById("reportArchiveList"),
         btnCopyReportTab: document.getElementById("btnCopyReportTab"),
+        btnQuickCopy: document.getElementById("btnQuickCopy"),
+        btnFooterSendBot: document.getElementById("btnFooterSendBot"),
         botTokenInput: document.getElementById("botTokenInput"),
         botChatIdInput: document.getElementById("botChatIdInput"),
         botAutoSendCheckbox: document.getElementById("botAutoSendCheckbox"),
@@ -783,248 +924,378 @@
         newServicePrice: document.getElementById("newServicePrice"),
         servicesListView: document.getElementById("servicesListView"),
         btnResetDefaultServices: document.getElementById("btnResetDefaultServices"),
-        footerTotalMoney: document.getElementById("footerTotalMoney"),
-        btnFooterSendBot: document.getElementById("btnFooterSendBot"),
-        btnQuickCopy: document.getElementById("btnQuickCopy")
+        addPresetForm: document.getElementById("addPresetForm"),
+        newPresetLabel: document.getElementById("newPresetLabel"),
+        newPresetItems: document.getElementById("newPresetItems"),
+        newPresetComment: document.getElementById("newPresetComment"),
+        presetsListView: document.getElementById("presetsListView"),
+        btnResetDefaultPresets: document.getElementById("btnResetDefaultPresets"),
+        footerTotalMoney: document.getElementById("footerTotalMoney")
       };
 
-      function showToast(message, type = "info") {
+      // Обновляет индикатор сегодняшней даты и дня недели в шапке
+      function renderHeaderTodayBadge() {
+        if (!els.headerTodayBadge) return;
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, "0");
+        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        const yyyy = now.getFullYear();
+        const weekdays = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"];
+        const dayShort = weekdays[now.getDay()] || "";
+        els.headerTodayBadge.innerHTML = `<span class="block text-slate-900">${dd}.${mm}.${yyyy}</span><span class="block text-[10px] font-semibold text-slate-500 uppercase">${dayShort}</span>`;
+      }
+
+      // Показывает верхний уведомляющий баннер с автоскрытием
+      function showToast(message, type) {
         if (!els.toastBanner || !els.toastText) return;
-        clearTimeout(toastTimeout);
-        els.toastBanner.className = "mx-4 mt-3 px-4 py-2.5 rounded-2xl text-xs font-medium flex items-center justify-between gap-2 shadow-sm border ";
-        if (type === "success") {
-          els.toastBanner.className += "bg-emerald-50 text-emerald-900 border-emerald-200";
-        } else if (type === "warn") {
-          els.toastBanner.className += "bg-amber-50 text-amber-900 border-amber-200";
-        } else {
-          els.toastBanner.className += "bg-blue-50 text-blue-900 border-blue-200";
-        }
+        const tone = type || "info";
         els.toastText.textContent = message;
+        const palette = {
+          success: "bg-emerald-50 text-emerald-900 border-emerald-200",
+          warn: "bg-amber-50 text-amber-900 border-amber-200",
+          info: "bg-blue-50 text-blue-900 border-blue-200"
+        };
+        els.toastBanner.className = `mx-4 mt-3 px-4 py-2.5 rounded-2xl text-xs font-medium flex items-center justify-between gap-2 shadow-sm border ${palette[tone] || palette.info}`;
         els.toastBanner.classList.remove("hidden");
+
+        if (toastTimeout) {
+          clearTimeout(toastTimeout);
+        }
         toastTimeout = setTimeout(() => {
           els.toastBanner.classList.add("hidden");
-        }, 3200);
+        }, 3400);
+      }
+
+      // Собирает уникальные адреса из текущей смены и сохранённой истории
+      function getRecentAddresses() {
+        const fromJobs = Array.isArray(state.jobs)
+          ? state.jobs.map((j) => (j && j.address ? String(j.address).trim() : "")).filter(Boolean)
+          : [];
+        let saved = [];
+        try {
+          const raw = localStorage.getItem(ADDRESS_HISTORY_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              saved = parsed.map((a) => String(a || "").trim()).filter(Boolean);
+            }
+          }
+        } catch (err) {
+          saved = [];
+        }
+        const merged = [];
+        const seen = new Set();
+        [...fromJobs.reverse(), ...saved].forEach((addr) => {
+          const key = addr.toLowerCase();
+          if (!seen.has(key)) {
+            seen.add(key);
+            merged.push(addr);
+          }
+        });
+        return merged.slice(0, 30);
+      }
+
+      // Сохраняет использованный адрес в историю подсказок
+      function rememberAddress(address) {
+        const clean = String(address || "").trim();
+        if (!clean) return;
+        const current = getRecentAddresses().filter((a) => a.toLowerCase() !== clean.toLowerCase());
+        const next = [clean, ...current].slice(0, 30);
+        try {
+          localStorage.setItem(ADDRESS_HISTORY_KEY, JSON.stringify(next));
+        } catch (err) {
+          // Игнорируем ошибку квоты хранилища
+        }
+        renderAddressSuggestions();
+      }
+
+      // Обновляет выпадающий список адресов для автоподстановки
+      function renderAddressSuggestions() {
+        if (!els.recentAddressesList) return;
+        const list = getRecentAddresses();
+        els.recentAddressesList.innerHTML = list
+          .map((addr) => `<option value="${escapeHtml(addr)}"></option>`)
+          .join("");
+      }
+
+      // Рендерит элементы быстрого ввода: пресеты и кнопку повтора
+      function renderOneHandHelpers() {
+        const presetsList = getPresetsList();
+        if (els.jobPresetsBar) {
+          els.jobPresetsBar.innerHTML = presetsList.length > 0
+            ? presetsList.map((preset) => `
+                <button
+                  type="button"
+                  data-preset-id="${escapeHtml(preset.id)}"
+                  class="job-preset-btn px-2.5 py-1.5 rounded-xl bg-amber-50/90 hover:bg-amber-100 active:scale-95 text-amber-900 border border-amber-200/90 text-[11px] font-bold transition"
+                >
+                  ⚡ ${escapeHtml(preset.label)}
+                </button>
+              `).join("")
+            : `<span class="text-[11px] text-slate-400">Добавьте шаблоны в разделе «Настр.»</span>`;
+        }
+
+        if (els.btnRepeatLastJob) {
+          const hasLast = Array.isArray(state.jobs) && state.jobs.length > 0;
+          els.btnRepeatLastJob.disabled = !hasLast;
+          els.btnRepeatLastJob.classList.toggle("opacity-45", !hasLast);
+          els.btnRepeatLastJob.classList.toggle("cursor-not-allowed", !hasLast);
+        }
+
+        renderAddressSuggestions();
+      }
+
+      // Применяет выбранный пресет позиций и комментария, затем пересчитывает суммы
+      function applyJobPreset(presetId) {
+        const preset = getPresetsList().find((p) => p.id === presetId);
+        if (!preset) return;
+
+        if (els.jobSelectedItemsBox) {
+          const existing = (els.jobSelectedItemsBox.value || "").trim();
+          const block = (preset.items || []).join("\n");
+          if (block) {
+            els.jobSelectedItemsBox.value = existing ? `${existing}\n${block}` : block;
+            resizeSelectedItemsBox();
+          }
+        }
+
+        const presetComment = String(preset.comment || "").trim();
+        if (presetComment && els.jobDesc) {
+          const currentDesc = (els.jobDesc.value || "").trim();
+          if (!currentDesc) {
+            els.jobDesc.value = presetComment;
+          } else if (currentDesc.toLowerCase().indexOf(presetComment.toLowerCase()) === -1) {
+            els.jobDesc.value = `${currentDesc}\n${presetComment}`;
+          }
+          resizeJobDescBox();
+        }
+
+        const totalItemsSum = parseSelectedItemsSum();
+        if (els.jobServices) {
+          els.jobServices.value = String(totalItemsSum);
+        }
+        if (els.jobFromAcc) {
+          els.jobFromAcc.value = "";
+        }
+
+        const cashVal = parseNum(els.jobCashReceived ? els.jobCashReceived.value : 0);
+        if (cashVal > 0 && els.jobToAcc) {
+          els.jobToAcc.value = cashVal > totalItemsSum ? String(cashVal - totalItemsSum) : "0";
+        }
+
+        updatePaymentCalculationPreview();
+        showToast(`Применён шаблон: ${preset.label}`, "success");
+      }
+
+      // Копирует последнюю заявку смены в форму для быстрого повтора
+      function repeatLastJob() {
+        if (!Array.isArray(state.jobs) || state.jobs.length === 0) {
+          showToast("Нет сохранённых заявок для повтора", "warn");
+          return;
+        }
+        const last = state.jobs[state.jobs.length - 1];
+        state.editingJobId = null;
+        if (els.jobAddress) els.jobAddress.value = last.address || "";
+        if (els.jobDesc) {
+          els.jobDesc.value = last.description || "";
+          resizeJobDescBox();
+        }
+        if (els.jobSelectedItemsBox) {
+          els.jobSelectedItemsBox.value = last.selectedItems || "";
+          resizeSelectedItemsBox();
+        }
+        if (els.jobFromAcc) els.jobFromAcc.value = last.fromAcc || "";
+        if (els.jobServices) els.jobServices.value = last.services || "";
+        if (els.jobToAcc) els.jobToAcc.value = last.toAcc || "";
+        if (els.jobCashReceived) {
+          const sVal = parseNum(last.services);
+          const tVal = parseNum(last.toAcc);
+          els.jobCashReceived.value = tVal > 0 ? String(sVal + tVal) : "";
+        }
+        if (els.jobTime) els.jobTime.value = "";
+        updatePaymentCalculationPreview();
+        renderJobsUI();
+        if (els.jobAddress) els.jobAddress.focus();
+        showToast("Скопирована предыдущая заявка", "success");
       }
 
       function isStandalonePwaMode() {
-        return Boolean(
-          window.matchMedia("(display-mode: standalone)").matches ||
-          window.matchMedia("(display-mode: fullscreen)").matches ||
-          window.navigator.standalone === true
-        );
+        try {
+          return Boolean(
+            (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+            (window.matchMedia && window.matchMedia("(display-mode: fullscreen)").matches) ||
+            window.navigator.standalone === true
+          );
+        } catch (err) {
+          return false;
+        }
       }
 
-      function setupPwaSupport() {
-        const iconSvg = [
-          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">',
-          '<rect width="512" height="512" rx="112" fill="#2563eb"/>',
-          '<circle cx="256" cy="212" r="32" fill="#ffffff"/>',
-          '<path d="M242 244h28l18 148h-64z" fill="#ffffff"/>',
-          '<path d="M188 158a96 96 0 0 0 0 108" fill="none" stroke="#bfdbfe" stroke-width="24" stroke-linecap="round"/>',
-          '<path d="M324 158a96 96 0 0 1 0 108" fill="none" stroke="#bfdbfe" stroke-width="24" stroke-linecap="round"/>',
-          '<path d="M142 118a156 156 0 0 0 0 188" fill="none" stroke="#ffffff" stroke-width="22" stroke-linecap="round"/>',
-          '<path d="M370 118a156 156 0 0 1 0 188" fill="none" stroke="#ffffff" stroke-width="22" stroke-linecap="round"/>',
-          '</svg>'
-        ].join("");
-        const iconDataUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(iconSvg);
-
-        const appleLink = document.getElementById("appleTouchIconLink");
-        if (appleLink) appleLink.href = iconDataUrl;
-
-        const isHttpContext = window.location.protocol === "http:" || window.location.protocol === "https:";
-        const basePathUrl = isHttpContext
-          ? new URL("./", window.location.href).href
-          : "./";
-
-        const manifestObj = {
-          id: isHttpContext ? basePathUrl : "pmh-master-gorynych-pwa",
-          name: "РМН мастер by Горыныч",
-          short_name: "РМН мастер",
-          description: "Учёт заявок, пробега и отчётов за смену",
-          start_url: isHttpContext ? basePathUrl : "./",
-          scope: isHttpContext ? basePathUrl : "./",
-          display: "standalone",
-          display_override: ["standalone", "minimal-ui"],
-          background_color: "#f8fafc",
-          theme_color: "#2563eb",
-          orientation: "portrait",
-          icons: [
-            { src: iconDataUrl, sizes: "192x192", type: "image/svg+xml", purpose: "any" },
-            { src: iconDataUrl, sizes: "512x512", type: "image/svg+xml", purpose: "any" },
-            { src: iconDataUrl, sizes: "512x512", type: "image/svg+xml", purpose: "maskable" }
-          ]
-        };
-
-        const manifestLink = document.getElementById("pwaManifestLink");
-        if (manifestLink) {
-          manifestLink.href = "data:application/manifest+json;charset=utf-8," + encodeURIComponent(JSON.stringify(manifestObj));
-        }
-
-        if (els.btnInstallPwaHeader && isHttpContext && !isStandalonePwaMode()) {
-          els.btnInstallPwaHeader.classList.remove("hidden");
-        }
-
-        window.addEventListener("beforeinstallprompt", (e) => {
-          e.preventDefault();
-          deferredInstallPrompt = e;
-          if (els.btnInstallPwaHeader && !isStandalonePwaMode()) {
-            els.btnInstallPwaHeader.classList.remove("hidden");
+      // Безопасно формирует абсолютный URL относительно текущей страницы, если контекст позволяет
+      function resolveSafeUrl(relativePath) {
+        try {
+          if (window.location && (window.location.protocol === "http:" || window.location.protocol === "https:")) {
+            return new URL(relativePath, window.location.href).href;
           }
-        });
+        } catch (err) {
+          // Игнорируем ошибку формирования URL в ограниченной песочнице
+        }
+        return relativePath;
+      }
 
-        window.addEventListener("appinstalled", () => {
-          deferredInstallPrompt = null;
-          if (els.btnInstallPwaHeader) els.btnInstallPwaHeader.classList.add("hidden");
-          showToast("✓ Приложение «РМН мастер» установлено", "success");
-        });
+      // Настраивает манифест PWA, иконку и Service Worker для офлайн-доступа
+      function setupPwaSupport() {
+        try {
+          const uploadedIconFile = "7b5a71dd-d93c-43db-aa1d-e2a96061a882.png";
+          const iconUrl = resolveSafeUrl(uploadedIconFile);
 
-        if ("serviceWorker" in navigator && (window.location.protocol === "https:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
-          const swCode = [
-            "const CACHE_NAME = 'rmn-master-pwa-v2';",
-            "self.addEventListener('install', (e) => { self.skipWaiting(); });",
-            "self.addEventListener('activate', (e) => {",
-            "  e.waitUntil(",
-            "    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))).then(() => self.clients.claim())",
-            "  );",
-            "});",
-            "self.addEventListener('fetch', (e) => {",
-            "  if (e.request.method !== 'GET') return;",
-            "  e.respondWith(",
-            "    fetch(e.request).then((res) => {",
-            "      const copy = res.clone();",
-            "      caches.open(CACHE_NAME).then((cache) => cache.put(e.request, copy)).catch(() => {});",
-            "      return res;",
-            "    }).catch(() => caches.match(e.request).then((cached) => cached || caches.match('./')))",
-            "  );",
-            "});"
-          ].join("\n");
-          try {
+          const headerIconEl = document.getElementById("headerAppIcon");
+          const headerIconFallback = document.getElementById("headerAppIconFallback");
+          const showFallbackIcon = function () {
+            if (headerIconEl) {
+              headerIconEl.classList.add("hidden");
+            }
+            if (headerIconFallback) {
+              headerIconFallback.classList.remove("hidden");
+            }
+          };
+
+          if (headerIconEl) {
+            headerIconEl.addEventListener("error", function onIconError() {
+              const currentSrc = headerIconEl.getAttribute("src") || "";
+              if (currentSrc !== uploadedIconFile) {
+                headerIconEl.addEventListener("error", showFallbackIcon, { once: true });
+                headerIconEl.src = uploadedIconFile;
+              } else {
+                showFallbackIcon();
+              }
+            }, { once: true });
+            headerIconEl.src = iconUrl;
+          }
+
+          const appleLink = document.getElementById("appleTouchIconLink");
+          if (appleLink) appleLink.href = iconUrl;
+
+          const isHttpContext = window.location && (window.location.protocol === "http:" || window.location.protocol === "https:");
+          const basePathUrl = isHttpContext ? resolveSafeUrl("./") : "./";
+
+          const manifestObj = {
+            id: isHttpContext ? basePathUrl : "pmh-master-gorynych-pwa",
+            name: "РМН мастер by Горыныч",
+            short_name: "РМН мастер",
+            description: "Учёт заявок, пробега и отчётов за смену",
+            start_url: basePathUrl,
+            scope: basePathUrl,
+            display: "standalone",
+            display_override: ["standalone", "minimal-ui"],
+            background_color: "#f8fafc",
+            theme_color: "#2563eb",
+            orientation: "portrait",
+            icons: [
+              { src: iconUrl, sizes: "192x192", type: "image/png", purpose: "any" },
+              { src: iconUrl, sizes: "512x512", type: "image/png", purpose: "any" },
+              { src: iconUrl, sizes: "512x512", type: "image/png", purpose: "maskable" }
+            ]
+          };
+
+          const manifestLink = document.getElementById("pwaManifestLink");
+          if (manifestLink && typeof Blob !== "undefined" && typeof URL !== "undefined" && typeof URL.createObjectURL === "function") {
+            const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: "application/manifest+json" });
+            manifestLink.href = URL.createObjectURL(manifestBlob);
+          }
+
+          if ("serviceWorker" in navigator && isHttpContext && typeof Blob !== "undefined" && typeof URL !== "undefined" && typeof URL.createObjectURL === "function") {
+            const swCode = `
+              const CACHE_NAME = "pmh-master-gorynych-v1";
+              self.addEventListener("install", (event) => {
+                self.skipWaiting();
+                event.waitUntil(
+                  caches.open(CACHE_NAME).then((cache) => cache.addAll(["./"]).catch(() => {}))
+                );
+              });
+              self.addEventListener("activate", (event) => {
+                event.waitUntil(
+                  caches.keys().then((keys) =>
+                    Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+                  ).then(() => self.clients.claim())
+                );
+              });
+              self.addEventListener("fetch", (event) => {
+                if (event.request.method !== "GET") return;
+                event.respondWith(
+                  fetch(event.request)
+                    .then((response) => {
+                      const copy = response.clone();
+                      caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy)).catch(() => {});
+                      return response;
+                    })
+                    .catch(() => caches.match(event.request))
+                );
+              });
+            `;
             const swBlob = new Blob([swCode], { type: "application/javascript" });
             const swUrl = URL.createObjectURL(swBlob);
-            navigator.serviceWorker.register(swUrl).catch(() => {});
-          } catch (err) {
-            // Игнорируем ограничения регистрации blob SW в отдельных браузерах
+            navigator.serviceWorker.register(swUrl, { scope: "./" }).catch(() => {});
           }
+        } catch (err) {
+          // Не блокируем запуск интерфейса при ограничениях среды
         }
       }
 
-      async function triggerPwaInstall() {
+      function updateInstallButtonVisibility() {
+        if (!els.btnInstallPwaHeader) return;
         if (isStandalonePwaMode()) {
-          showToast("Приложение уже открыто в установленном окне", "info");
+          els.btnInstallPwaHeader.classList.add("hidden");
           return;
         }
-        if (!deferredInstallPrompt) {
-          showToast("Откройте сайт в Chrome/Safari (не в окне Telegram) и выберите «Установить приложение» / «На экран Домой»", "info");
-          return;
-        }
-        deferredInstallPrompt.prompt();
-        const choice = await deferredInstallPrompt.userChoice;
-        if (choice && choice.outcome === "accepted") {
-          deferredInstallPrompt = null;
-          if (els.btnInstallPwaHeader) els.btnInstallPwaHeader.classList.add("hidden");
+        if (deferredInstallPrompt) {
+          els.btnInstallPwaHeader.classList.remove("hidden");
         }
       }
 
+      // Преобразует произвольное значение в безопасное число
       function parseNum(val) {
-        if (val === null || val === undefined || val === "") return 0;
-        const cleaned = String(val).replace(/[^0-9.,-]/g, "").replace(",", ".");
-        const parsed = parseFloat(cleaned);
-        return Number.isNaN(parsed) ? 0 : parsed;
+        if (typeof val === "number") return Number.isFinite(val) ? val : 0;
+        const cleaned = String(val || "").replace(/\s+/g, "").replace(",", ".");
+        const num = parseFloat(cleaned);
+        return Number.isFinite(num) ? num : 0;
       }
 
-      function formatRub(num) {
-        return Number(num || 0).toLocaleString("ru-RU") + " ₽";
+      // Форматирует число для вывода в отчётах и интерфейсе
+      function formatMoney(num) {
+        const rounded = Math.round((parseNum(num) + Number.EPSILON) * 100) / 100;
+        return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2).replace(".", ",");
       }
 
+      // Экранирует спецсимволы HTML
       function escapeHtml(str) {
         return String(str || "")
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;");
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
       }
 
-      function parseTelegramTarget(rawInput) {
-        const raw = String(rawInput || "").trim();
-        if (!raw) {
-          return { chatId: "", threadId: null, messageId: null, isLink: false };
-        }
-
-        const privateMatch = raw.match(/(?:https?:\/\/)?(?:t\.me|telegram\.me)\/c\/(\d+)(?:\/(\d+)(?:\/(\d+))?)?/i);
-        if (privateMatch) {
-          const internalId = privateMatch[1];
-          const firstNum = privateMatch[2] ? Number(privateMatch[2]) : null;
-          const secondNum = privateMatch[3] ? Number(privateMatch[3]) : null;
-          const threadId = secondNum ? firstNum : null;
-          const messageId = secondNum || firstNum || null;
-          return {
-            chatId: `-100${internalId}`,
-            threadId,
-            messageId,
-            isLink: true
-          };
-        }
-
-        const publicMatch = raw.match(/(?:https?:\/\/)?(?:t\.me|telegram\.me)\/([A-Za-z0-9_]+)(?:\/(\d+)(?:\/(\d+))?)?/i);
-        if (publicMatch && publicMatch[1] !== "c") {
-          const username = publicMatch[1].startsWith("@") ? publicMatch[1] : `@${publicMatch[1]}`;
-          const firstNum = publicMatch[2] ? Number(publicMatch[2]) : null;
-          const secondNum = publicMatch[3] ? Number(publicMatch[3]) : null;
-          const threadId = secondNum ? firstNum : null;
-          const messageId = secondNum || firstNum || null;
-          return {
-            chatId: username,
-            threadId,
-            messageId,
-            isLink: true
-          };
-        }
-
-        return { chatId: raw, threadId: null, messageId: null, isLink: false };
+      // Возвращает текущую дату в формате ДД.ММ.ГГГГ
+      function getTodayFormatted() {
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, "0");
+        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        const yyyy = now.getFullYear();
+        return `${dd}.${mm}.${yyyy}`;
       }
 
-      function saveState() {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        } catch (err) {
-          // Игнорируем ошибки квоты хранилища
-        }
+      // Возвращает текущее время в формате ЧЧ:ММ:СС
+      function getNowTimeFormatted() {
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, "0");
+        const mm = String(now.getMinutes()).padStart(2, "0");
+        const ss = String(now.getSeconds()).padStart(2, "0");
+        return `${hh}:${mm}:${ss}`;
       }
 
-      function loadState() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            const def = createDefaultState();
-            const loadedServices = Array.isArray(parsed.services) && parsed.services.length > 0
-              ? parsed.services
-              : def.services;
-            state = {
-              ...def,
-              ...parsed,
-              services: loadedServices,
-              bot: {
-                ...def.bot,
-                ...(parsed.bot || {}),
-                autoSend: parsed.bot && typeof parsed.bot.autoSend === "boolean" ? parsed.bot.autoSend : true
-              },
-              shift: {
-                ...def.shift,
-                ...(parsed.shift || {}),
-                extraFuels: Array.isArray(parsed.shift && parsed.shift.extraFuels) ? parsed.shift.extraFuels : []
-              },
-              jobs: Array.isArray(parsed.jobs) ? parsed.jobs : []
-            };
-            if (!state.services.some((s) => s.id === state.selectedServiceId)) {
-              state.selectedServiceId = state.services[0].id;
-            }
-          }
-        } catch (err) {
-          state = createDefaultState();
-        }
-      }
-
+      // Возвращает актуальный список услуг/расходников
       function getServicesList() {
         if (!Array.isArray(state.services) || state.services.length === 0) {
           state.services = DEFAULT_SERVICES.map((s) => ({ ...s }));
@@ -1032,105 +1303,998 @@
         return state.services;
       }
 
-      function getSelectedService() {
-        const list = getServicesList();
-        return list.find((s) => s.id === state.selectedServiceId) || list[0];
+      // Возвращает актуальный список пользовательских пресетов заявок
+      function getPresetsList() {
+        if (!Array.isArray(state.presets)) {
+          state.presets = DEFAULT_JOB_PRESETS.map((p) => ({ ...p, items: [...p.items] }));
+        }
+        return state.presets;
       }
 
-      function resizeSelectedItemsBox() {
-        if (!els.jobSelectedItemsBox) return;
-        els.jobSelectedItemsBox.style.height = "auto";
-        const minHeight = 76;
-        const nextHeight = Math.max(minHeight, els.jobSelectedItemsBox.scrollHeight + 4);
-        els.jobSelectedItemsBox.style.height = `${nextHeight}px`;
+      // Извлекает из строки позиции (сперва сумма и ₽, затем описание) название услуги и количество
+      function parseServiceLineItem(line) {
+        const clean = String(line || "").trim();
+        if (!clean) return null;
+        const match = clean.match(/^[-+]?\d+(?:[.,]\d+)?\s*₽\s*[—–-]\s*(.+)$/);
+        if (!match) return null;
+        const rawLabel = match[1].trim();
+        const qtyMatch = rawLabel.match(/^(.*?)\s*[×x*]\s*(\d+(?:[.,]\d+)?)\s*$/i);
+        if (qtyMatch) {
+          return {
+            name: qtyMatch[1].trim(),
+            qty: parseNum(qtyMatch[2])
+          };
+        }
+        return {
+          name: rawLabel,
+          qty: 1
+        };
       }
 
-      function resizeJobDescBox() {
-        if (!els.jobDesc) return;
-        els.jobDesc.style.height = "auto";
-        const minHeight = 112;
-        const nextHeight = Math.max(minHeight, els.jobDesc.scrollHeight + 4);
-        els.jobDesc.style.height = `${nextHeight}px`;
-      }
+      // Синхронизирует суммы позиций и итоговую сумму в скобках пресетов по актуальному прайсу услуг
+      function syncPresetsWithServices() {
+        const services = getServicesList();
+        const priceByName = new Map(
+          services.map((s) => [String(s.name || "").trim().toLowerCase(), parseNum(s.price)])
+        );
 
-      function parseSelectedItemsSum() {
-        if (!els.jobSelectedItemsBox) return 0;
-        const raw = els.jobSelectedItemsBox.value || "";
-        const lines = raw.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
-        let sum = 0;
-        lines.forEach((line) => {
-          const match = line.match(/^\s*([0-9]+(?:[.,][0-9]+)?)\s*₽/);
-          if (match) {
-            sum += parseNum(match[1]);
+        let changed = false;
+        const presets = getPresetsList();
+        presets.forEach((preset) => {
+          if (!preset || !Array.isArray(preset.items)) return;
+
+          let totalPresetSum = 0;
+          let matchedAnyService = false;
+
+          const updatedItems = preset.items.map((line) => {
+            const parsed = parseServiceLineItem(line);
+            if (!parsed) {
+              const fallbackMatch = String(line || "").match(/^\s*([-+]?\d+(?:[.,]\d+)?)\s*₽/);
+              if (fallbackMatch) totalPresetSum += parseNum(fallbackMatch[1]);
+              return line;
+            }
+            const unitPrice = priceByName.get(parsed.name.toLowerCase());
+            if (typeof unitPrice === "number" && Number.isFinite(unitPrice)) {
+              matchedAnyService = true;
+              const lineSum = Math.round((unitPrice * parsed.qty + Number.EPSILON) * 100) / 100;
+              totalPresetSum += lineSum;
+              const qtySuffix = parsed.qty !== 1 ? ` × ${formatMoney(parsed.qty)}` : "";
+              const nextLine = `${formatMoney(lineSum)} ₽ — ${parsed.name}${qtySuffix}`;
+              if (nextLine !== line) changed = true;
+              return nextLine;
+            }
+            const fallbackMatch = String(line || "").match(/^\s*([-+]?\d+(?:[.,]\d+)?)\s*₽/);
+            if (fallbackMatch) totalPresetSum += parseNum(fallbackMatch[1]);
+            return line;
+          });
+
+          if (matchedAnyService) {
+            preset.items = updatedItems;
+            const roundedTotal = Math.round((totalPresetSum + Number.EPSILON) * 100) / 100;
+            const nextLabel = String(preset.label || "").replace(
+              /\(\s*[-+]?\d+(?:[.,]\d+)?\s*₽\s*\)/,
+              `(${formatMoney(roundedTotal)} ₽)`
+            );
+            if (nextLabel !== preset.label) {
+              preset.label = nextLabel;
+              changed = true;
+            }
           }
         });
-        return sum;
+
+        return changed;
       }
 
-      function getCurrentServicesAmount() {
-        const itemsSum = parseSelectedItemsSum();
-        if (itemsSum > 0) return itemsSum;
-        return parseNum(els.jobServices ? els.jobServices.value : 0);
+      // Парсит строки в окошке выбранных позиций (сперва сумма, потом описание) и возвращает общую сумму
+      function parseSelectedItemsSum() {
+        const raw = els.jobSelectedItemsBox ? els.jobSelectedItemsBox.value : "";
+        const lines = String(raw || "").split(/\r?\n/);
+        let sum = 0;
+
+        lines.forEach((line) => {
+          const trimmed = line.trim();
+          if (!trimmed) return;
+          const leadingMatch = trimmed.match(/^\s*([-+]?\d+(?:[.,]\d+)?)\s*₽/);
+          if (leadingMatch) {
+            sum += parseNum(leadingMatch[1]);
+            return;
+          }
+          const trailingMatch = trimmed.match(/([-+]?\d+(?:[.,]\d+)?)\s*₽\s*$/);
+          if (trailingMatch) {
+            sum += parseNum(trailingMatch[1]);
+          }
+        });
+
+        return Math.round((sum + Number.EPSILON) * 100) / 100;
       }
 
+      // Автоматически подстраивает высоту окошка выбранных позиций под его содержимое
+      function resizeSelectedItemsBox() {
+        const box = els.jobSelectedItemsBox;
+        if (!box) return;
+        box.style.height = "auto";
+        const minHeight = 76;
+        box.style.height = `${Math.max(minHeight, box.scrollHeight)}px`;
+      }
+
+      // Автоматически подстраивает высоту поля «Что сделано / комментарий» под его содержимое
+      function resizeJobDescBox() {
+        const box = els.jobDesc;
+        if (!box) return;
+        box.style.height = "auto";
+        const minHeight = 112;
+        box.style.height = `${Math.max(minHeight, box.scrollHeight)}px`;
+      }
+
+      // Обновляет предпросмотр расчёта суммы услуг и остатка «На счёт»
       function updatePaymentCalculationPreview() {
-        const servicesVal = getCurrentServicesAmount();
-        const toAccVal = parseNum(els.jobToAcc ? els.jobToAcc.value : 0);
+        const servicesSum = parseSelectedItemsSum();
+        const cashReceived = parseNum(els.jobCashReceived ? els.jobCashReceived.value : 0);
         const fromAccVal = parseNum(els.jobFromAcc ? els.jobFromAcc.value : 0);
-        const cashInputVal = parseNum(els.jobCashReceived ? els.jobCashReceived.value : 0);
+
+        if (els.jobServices) {
+          els.jobServices.value = servicesSum > 0 ? String(servicesSum) : "";
+        }
+
+        let toAccVal = 0;
+        if (cashReceived > 0 && fromAccVal === 0) {
+          toAccVal = cashReceived > servicesSum ? Math.round((cashReceived - servicesSum + Number.EPSILON) * 100) / 100 : 0;
+          if (els.jobToAcc) {
+            els.jobToAcc.value = String(toAccVal);
+          }
+        } else {
+          toAccVal = parseNum(els.jobToAcc ? els.jobToAcc.value : 0);
+        }
+
+        if (els.paymentDiffPreview) {
+          if (fromAccVal > 0) {
+            els.paymentDiffPreview.textContent = `Со счёта: ${formatMoney(fromAccVal)} ₽ · На счёт: 0 ₽`;
+          } else if (cashReceived > 0) {
+            els.paymentDiffPreview.textContent = `Взято: ${formatMoney(cashReceived)} ₽ · Услуги: ${formatMoney(servicesSum)} ₽ · На счёт: ${formatMoney(toAccVal)} ₽`;
+          } else {
+            els.paymentDiffPreview.textContent = `Услуги: ${formatMoney(servicesSum)} ₽ · На счёт: ${formatMoney(toAccVal)} ₽`;
+          }
+        }
 
         if (els.btnPayFromAccount) {
-          const accountSum = fromAccVal > 0 ? fromAccVal : servicesVal;
-          els.btnPayFromAccount.innerHTML = accountSum > 0
-            ? `<span>💳 Со счёта (${escapeHtml(formatRub(accountSum))})</span>`
-            : "<span>💳 Со счёта (0 ₽)</span>";
-        }
-
-        if (!els.paymentDiffPreview) return;
-
-        if (cashInputVal > 0 && cashInputVal > servicesVal) {
-          const remainder = cashInputVal - servicesVal;
-          els.paymentDiffPreview.textContent = `Взято ${formatRub(cashInputVal)} − услуги ${formatRub(servicesVal)} = ${formatRub(remainder)} на счёт`;
-          els.paymentDiffPreview.className = "text-[11px] font-bold text-emerald-700";
-        } else if (fromAccVal > 0) {
-          els.paymentDiffPreview.textContent = `Со счёта: ${formatRub(fromAccVal)}`;
-          els.paymentDiffPreview.className = "text-[11px] font-bold text-blue-700";
-        } else {
-          els.paymentDiffPreview.textContent = `Услуги: ${formatRub(servicesVal)} · На счёт: ${formatRub(toAccVal)}`;
-          els.paymentDiffPreview.className = "text-[11px] font-bold text-slate-600";
+          const accAmount = servicesSum > 0 ? servicesSum : fromAccVal;
+          els.btnPayFromAccount.innerHTML = `<span>💳 Со счёта (${formatMoney(accAmount)} ₽)</span>`;
         }
       }
 
-      function updateServiceFormulaPreview() {
-        const srv = getSelectedService();
-        const qty = Math.max(1, Math.floor(parseNum(state.serviceQty) || 1));
+      // Записывает оплату наличными: если указано «Взято ₽», остаток сверх услуг переносит в «На счёт»
+      function applyCashPayment() {
+        const servicesSum = parseSelectedItemsSum();
+        const cashReceived = parseNum(els.jobCashReceived ? els.jobCashReceived.value : 0);
+
+        if (servicesSum <= 0 && cashReceived <= 0) {
+          showToast("Сначала выберите услугу или укажите сумму в «Взято ₽»", "warn");
+          return;
+        }
+
+        if (els.jobFromAcc) els.jobFromAcc.value = "";
+
+        if (cashReceived > 0) {
+          const effectiveServices = servicesSum > 0 ? servicesSum : cashReceived;
+          const toAccount = cashReceived > effectiveServices
+            ? Math.round((cashReceived - effectiveServices + Number.EPSILON) * 100) / 100
+            : 0;
+          if (els.jobServices) els.jobServices.value = String(effectiveServices);
+          if (els.jobToAcc) els.jobToAcc.value = String(toAccount);
+          updatePaymentCalculationPreview();
+          showToast(
+            toAccount > 0
+              ? `Наличные: услуги ${formatMoney(effectiveServices)} ₽, на счёт ${formatMoney(toAccount)} ₽`
+              : `Наличные без сдачи: ${formatMoney(effectiveServices)} ₽`,
+            "success"
+          );
+        } else {
+          if (els.jobServices) els.jobServices.value = String(servicesSum);
+          if (els.jobToAcc) els.jobToAcc.value = "0";
+          updatePaymentCalculationPreview();
+          showToast(`Оплата наличными: ${formatMoney(servicesSum)} ₽`, "success");
+        }
+      }
+
+      // Записывает всю сумму выбранных позиций в оплату «со счёта»
+      function applyAccountPayment() {
+        const servicesSum = parseSelectedItemsSum();
+        if (servicesSum <= 0) {
+          showToast("Сначала подтвердите услугу или укажите позицию с суммой", "warn");
+          return;
+        }
+        if (els.jobCashReceived) els.jobCashReceived.value = "";
+        if (els.jobFromAcc) els.jobFromAcc.value = String(servicesSum);
+        if (els.jobServices) els.jobServices.value = "0";
+        if (els.jobToAcc) els.jobToAcc.value = "0";
+        updatePaymentCalculationPreview();
+        showToast(`Оплата со счёта: ${formatMoney(servicesSum)} ₽`, "success");
+      }
+
+      // Сохраняет состояние приложения в localStorage
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (err) {
+          showToast("Не удалось сохранить данные локально", "warn");
+        }
+      }
+
+      // Загружает и нормализует сохранённое состояние из localStorage
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          const def = createDefaultState();
+
+          const loadedServices = Array.isArray(parsed.services) && parsed.services.length > 0
+            ? parsed.services.map((s, idx) => ({
+                id: String(s.id || `srv_${idx}_${Date.now()}`),
+                name: String(s.name || "Услуга").trim() || "Услуга",
+                price: Math.max(0, parseNum(s.price))
+              }))
+            : def.services;
+
+          const loadedPresets = Array.isArray(parsed.presets)
+            ? parsed.presets.map((p, idx) => ({
+                id: String(p.id || `preset_${idx}_${Date.now()}`),
+                label: String(p.label || "Пресет").trim() || "Пресет",
+                items: Array.isArray(p.items) ? p.items.map((line) => String(line || "").trim()).filter(Boolean) : [],
+                comment: String(p.comment || "").trim()
+              }))
+            : def.presets;
+
+          const loadedArchive = Array.isArray(parsed.reportArchive)
+            ? parsed.reportArchive
+                .map((entry, idx) => ({
+                  id: String(entry && entry.id ? entry.id : `arch_${idx}_${Date.now()}`),
+                  date: String(entry && entry.date ? entry.date : getTodayFormatted()).trim() || getTodayFormatted(),
+                  carNumber: String(entry && entry.carNumber ? entry.carNumber : "").trim(),
+                  jobsCount: Math.max(0, Math.round(parseNum(entry && entry.jobsCount))),
+                  totalMoney: Math.max(0, parseNum(entry && entry.totalMoney)),
+                  savedAt: String(entry && entry.savedAt ? entry.savedAt : "").trim(),
+                  text: String(entry && entry.text ? entry.text : "")
+                }))
+                .filter((entry) => entry.text.trim().length > 0)
+                .slice(0, MAX_ARCHIVED_REPORTS)
+            : [];
+
+          const rawCursor = Math.round(parseNum(parsed.archiveRingCursor));
+          const normalizedCursor = loadedArchive.length < MAX_ARCHIVED_REPORTS
+            ? loadedArchive.length % MAX_ARCHIVED_REPORTS
+            : ((rawCursor % MAX_ARCHIVED_REPORTS) + MAX_ARCHIVED_REPORTS) % MAX_ARCHIVED_REPORTS;
+
+          const loadedShift = parsed.shift || {};
+          const loadedExtraFuels = Array.isArray(loadedShift.extraFuels)
+            ? loadedShift.extraFuels.map((f, idx) => ({
+                id: String(f && f.id ? f.id : `fuel_${idx}_${Date.now()}`),
+                fuelType: String(f && f.fuelType ? f.fuelType : ""),
+                fuelValue: String(f && f.fuelValue ? f.fuelValue : "")
+              }))
+            : [];
+
+          state = {
+            ...def,
+            ...parsed,
+            services: loadedServices,
+            presets: loadedPresets,
+            bot: { ...def.bot, ...(parsed.bot || {}) },
+            shift: {
+              ...def.shift,
+              ...loadedShift,
+              extraFuels: loadedExtraFuels
+            },
+            jobs: Array.isArray(parsed.jobs) ? parsed.jobs : [],
+            reportArchive: loadedArchive,
+            archiveRingCursor: normalizedCursor
+          };
+
+          if (!state.services.some((s) => s.id === state.selectedServiceId)) {
+            state.selectedServiceId = state.services[0].id;
+          }
+          if (!state.serviceQty || state.serviceQty < 1) {
+            state.serviceQty = 1;
+          }
+        } catch (err) {
+          state = createDefaultState();
+        }
+      }
+
+      // Переключает активную вкладку интерфейса
+      function switchTab(tabName) {
+        if (!els.tabPanels[tabName]) return;
+        state.activeTab = tabName;
+
+        els.tabBtns.forEach((btn) => {
+          const isActive = btn.dataset.tab === tabName;
+          btn.classList.toggle("bg-white", isActive);
+          btn.classList.toggle("text-slate-900", isActive);
+          btn.classList.toggle("shadow-sm", isActive);
+          btn.classList.toggle("text-slate-600", !isActive);
+        });
+
+        Object.keys(els.tabPanels).forEach((key) => {
+          els.tabPanels[key].classList.toggle("hidden", key !== tabName);
+        });
+
+        if (tabName === "report") {
+          renderReport();
+          renderReportArchive();
+        } else if (tabName === "settings") {
+          renderServicesSettings();
+          renderPresetsSettings();
+        } else if (tabName === "jobs") {
+          renderServiceSelector();
+          renderOneHandHelpers();
+          resizeSelectedItemsBox();
+          resizeJobDescBox();
+        }
+
+        saveState();
+      }
+
+      // Вычисляет пробег за смену
+      function computeMileage() {
+        const startRaw = String(state.shift.startKm || "").trim();
+        const endRaw = String(state.shift.endKm || "").trim();
+        if (startRaw === "" && endRaw === "") return 0;
+        const start = parseNum(startRaw);
+        const end = parseNum(endRaw);
+        const diff = end - start;
+        return diff > 0 ? diff : 0;
+      }
+
+      // Собирает все заполненные заправки смены (основную и дополнительные)
+      function getAllFuelsList() {
+        const list = [];
+        const mainType = String(state.shift.fuelType || "").trim();
+        const mainVal = String(state.shift.fuelValue || "").trim();
+        if (mainType || mainVal) {
+          list.push({ fuelType: mainType, fuelValue: mainVal });
+        }
+        const extras = Array.isArray(state.shift.extraFuels) ? state.shift.extraFuels : [];
+        extras.forEach((item) => {
+          const fType = String(item && item.fuelType ? item.fuelType : "").trim();
+          const fVal = String(item && item.fuelValue ? item.fuelValue : "").trim();
+          if (fType || fVal) {
+            list.push({ fuelType: fType, fuelValue: fVal });
+          }
+        });
+        return list;
+      }
+
+      // Рендерит дополнительные строки заправок на вкладке «Смена»
+      function renderExtraFuels() {
+        if (!els.extraFuelsContainer) return;
+        const extras = Array.isArray(state.shift.extraFuels) ? state.shift.extraFuels : [];
+        if (extras.length === 0) {
+          els.extraFuelsContainer.innerHTML = "";
+          return;
+        }
+
+        els.extraFuelsContainer.innerHTML = extras.map((fuel, idx) => `
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-slate-500">Заправка #${idx + 2}</span>
+              <button
+                type="button"
+                data-remove-fuel-id="${escapeHtml(fuel.id)}"
+                class="remove-fuel-btn text-[11px] font-semibold text-rose-600 hover:text-rose-700"
+              >
+                Удалить
+              </button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <select
+                data-extra-fuel-type-id="${escapeHtml(fuel.id)}"
+                class="extra-fuel-type w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:border-blue-500 focus:outline-none text-xs sm:text-sm"
+              >
+                <option value="" ${fuel.fuelType === "" ? "selected" : ""}>Без заправки</option>
+                <option value="АИ-92" ${fuel.fuelType === "АИ-92" ? "selected" : ""}>⛽️ Заправка АИ-92</option>
+                <option value="Метан" ${fuel.fuelType === "Метан" ? "selected" : ""}>💎 Заправка Метан</option>
+                <option value="Пропан" ${fuel.fuelType === "Пропан" ? "selected" : ""}>💧 Заправка Пропан</option>
+              </select>
+              <input
+                type="text"
+                data-extra-fuel-val-id="${escapeHtml(fuel.id)}"
+                value="${escapeHtml(fuel.fuelValue || "")}"
+                placeholder="например, 18 л или 1200 ₽"
+                class="extra-fuel-val w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:border-blue-500 focus:outline-none text-xs sm:text-sm"
+              />
+            </div>
+          </div>
+        `).join("");
+      }
+
+      // Добавляет новую дополнительную строку заправки
+      function addExtraFuelRow() {
+        if (!Array.isArray(state.shift.extraFuels)) {
+          state.shift.extraFuels = [];
+        }
+        state.shift.extraFuels.push({
+          id: `fuel_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          fuelType: "АИ-92",
+          fuelValue: ""
+        });
+        renderExtraFuels();
+        saveState();
+        renderReport();
+      }
+
+      // Удаляет дополнительную строку заправки по идентификатору
+      function removeExtraFuelRow(fuelId) {
+        if (!Array.isArray(state.shift.extraFuels)) return;
+        state.shift.extraFuels = state.shift.extraFuels.filter((f) => f.id !== fuelId);
+        renderExtraFuels();
+        saveState();
+        renderReport();
+      }
+
+      // Вычисляет сводку финансов за смену
+      function computeFinanceTotals() {
+        let fromAccountTotal = 0;
+        let servicesCashTotal = 0;
+        let toAccountTotal = 0;
+
+        state.jobs.forEach((job) => {
+          fromAccountTotal += parseNum(job.fromAcc);
+          servicesCashTotal += parseNum(job.services);
+          toAccountTotal += parseNum(job.toAcc);
+        });
+
+        const grandTotal = servicesCashTotal + toAccountTotal;
+        return {
+          fromAccountTotal,
+          servicesCashTotal,
+          toAccountTotal,
+          grandTotal
+        };
+      }
+
+      // Формирует итоговый текст отчёта за смену
+      function buildReportText() {
+        const s = state.shift;
+        const mileage = computeMileage();
+        const fin = computeFinanceTotals();
+        const lines = [];
+
+        lines.push("📝 ОТЧЁТ (РМН)");
+        lines.push(`🗓 Дата: ${s.date && s.date.trim() ? s.date.trim() : "—"}`);
+        lines.push(`🧑‍💼 Менеджер: ${s.manager && s.manager.trim() ? s.manager.trim() : "—"}`);
+        lines.push(`🧑‍🔧 Монтажники: ${s.installers && s.installers.trim() ? s.installers.trim() : "—"}`);
+        lines.push(`🚌 Номер авто: ${s.carNumber && s.carNumber.trim() ? s.carNumber.trim() : "—"}`);
+        lines.push(`🚗 Пробег за день: ${formatMoney(mileage)} км`);
+
+        const fuels = getAllFuelsList();
+        if (fuels.length > 0) {
+          const fuelIconMap = {
+            "АИ-92": "⛽️",
+            "Метан": "💎",
+            "Пропан": "💧"
+          };
+          fuels.forEach((f) => {
+            const icon = fuelIconMap[f.fuelType] || "⛽️";
+            const titlePart = f.fuelType ? `Заправка ${f.fuelType}` : "Заправка";
+            const valuePart = f.fuelValue ? ` — ${f.fuelValue}` : "";
+            lines.push(`${icon} ${titlePart}${valuePart}`);
+          });
+        }
+
+        lines.push("");
+        lines.push("📌 Заявки:");
+
+        if (!state.jobs.length) {
+          lines.push("— заявок пока нет");
+        } else {
+          state.jobs.forEach((job, index) => {
+            lines.push("");
+            lines.push(`${index + 1}) 📍 ${job.address.trim()}`);
+            if (job.description && job.description.trim()) {
+              lines.push(`   • Что сделано: ${job.description.trim()}`);
+            }
+            if (job.selectedItems && job.selectedItems.trim()) {
+              lines.push("   • Позиции:");
+              job.selectedItems
+                .split(/\r?\n/)
+                .map((l) => l.trim())
+                .filter(Boolean)
+                .forEach((itemLine) => {
+                  lines.push(`     - ${itemLine}`);
+                });
+            }
+
+            const fromAcc = parseNum(job.fromAcc);
+            const srv = parseNum(job.services);
+            const toAcc = parseNum(job.toAcc);
+            const payParts = [];
+            if (fromAcc > 0) payParts.push(`со счёта ${formatMoney(fromAcc)} ₽`);
+            if (srv > 0) payParts.push(`услуги ${formatMoney(srv)} ₽`);
+            if (toAcc > 0) payParts.push(`на счёт ${formatMoney(toAcc)} ₽`);
+            if (payParts.length > 0) {
+              lines.push(`   • Оплата: ${payParts.join(", ")}`);
+            }
+
+            if (job.time && job.time.trim()) {
+              lines.push(`   • Время: ${job.time.trim()}`);
+            }
+          });
+        }
+
+        lines.push("");
+        lines.push("💰 ФИНАНСЫ за день:");
+        lines.push(`▪ со счета: ${formatMoney(fin.fromAccountTotal)} ₽`);
+        lines.push(`▪ услуги: ${formatMoney(fin.servicesCashTotal)} ₽`);
+        lines.push(`▪ на счет: ${formatMoney(fin.toAccountTotal)} ₽`);
+        lines.push(`💵 общая (услуг и на счет): ${formatMoney(fin.grandTotal)} ₽`);
+
+        return lines.join("\n");
+      }
+
+      // Рендерит текстовое поле отчёта и счётчики в шапке/подвале
+      function renderReport() {
+        const text = buildReportText();
+        const fin = computeFinanceTotals();
+        const mileage = computeMileage();
+
+        if (els.reportOutput) {
+          els.reportOutput.value = text;
+        }
+        if (els.jobsCountBadge) {
+          els.jobsCountBadge.textContent = String(state.jobs.length);
+        }
+        if (els.jobsTotalMini) {
+          els.jobsTotalMini.textContent = `Итого: ${formatMoney(fin.grandTotal)} ₽`;
+        }
+        if (els.footerTotalMoney) {
+          els.footerTotalMoney.textContent = `${formatMoney(fin.grandTotal)} ₽`;
+        }
+        if (els.dayMileageBadge) {
+          els.dayMileageBadge.textContent = `Пробег: ${formatMoney(mileage)} км`;
+        }
+        renderOneHandHelpers();
+        renderReportArchive();
+      }
+
+      // Сохраняет текущий отчёт смены в кольцевой архив (до 15 записей с перезаписью по кругу)
+      function archiveCurrentShiftReport() {
+        const hasShiftData = Boolean(
+          (state.shift.date && state.shift.date.trim()) ||
+          (state.shift.manager && state.shift.manager.trim()) ||
+          (state.shift.installers && state.shift.installers.trim()) ||
+          (state.shift.carNumber && state.shift.carNumber.trim()) ||
+          computeMileage() > 0 ||
+          getAllFuelsList().length > 0 ||
+          (Array.isArray(state.jobs) && state.jobs.length > 0)
+        );
+
+        if (!hasShiftData) return false;
+
+        if (!Array.isArray(state.reportArchive)) {
+          state.reportArchive = [];
+        }
+
+        const fin = computeFinanceTotals();
+        const now = new Date();
+        const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+        const archiveEntry = {
+          id: `arch_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          date: (state.shift.date && state.shift.date.trim()) ? state.shift.date.trim() : getTodayFormatted(),
+          carNumber: (state.shift.carNumber && state.shift.carNumber.trim()) ? state.shift.carNumber.trim() : "",
+          jobsCount: Array.isArray(state.jobs) ? state.jobs.length : 0,
+          totalMoney: fin.grandTotal,
+          savedAt: timeStr,
+          text: buildReportText()
+        };
+
+        if (state.reportArchive.length < MAX_ARCHIVED_REPORTS) {
+          state.reportArchive.push(archiveEntry);
+          state.archiveRingCursor = state.reportArchive.length % MAX_ARCHIVED_REPORTS;
+        } else {
+          const slotIndex = ((Math.round(parseNum(state.archiveRingCursor)) % MAX_ARCHIVED_REPORTS) + MAX_ARCHIVED_REPORTS) % MAX_ARCHIVED_REPORTS;
+          state.reportArchive[slotIndex] = archiveEntry;
+          state.archiveRingCursor = (slotIndex + 1) % MAX_ARCHIVED_REPORTS;
+        }
+
+        expandedArchiveId = archiveEntry.id;
+        return true;
+      }
+
+      // Рендерит список прошлых отчётов в свёрнутом виде с раскрытием по нажатию
+      function renderReportArchive() {
+        if (!els.reportArchiveList || !els.archiveCountBadge) return;
+        const archive = Array.isArray(state.reportArchive) ? state.reportArchive : [];
+        els.archiveCountBadge.textContent = `${archive.length} / ${MAX_ARCHIVED_REPORTS}`;
+
+        if (archive.length === 0) {
+          els.reportArchiveList.innerHTML = `
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-400">
+              Сохранённых прошлых отчётов пока нет. Они появятся здесь при переходе на «Новый день».
+            </div>
+          `;
+          return;
+        }
+
+        const ordered = [...archive].reverse();
+        els.reportArchiveList.innerHTML = ordered.map((item) => {
+          const isExpanded = expandedArchiveId === item.id;
+          const carMeta = item.carNumber ? ` · Авто ${escapeHtml(item.carNumber)}` : "";
+          const timeMeta = item.savedAt ? ` · ${escapeHtml(item.savedAt)}` : "";
+          return `
+            <div class="rounded-xl border border-slate-200/90 bg-slate-50/80 overflow-hidden transition">
+              <button
+                type="button"
+                data-toggle-archive-id="${escapeHtml(item.id)}"
+                class="archive-toggle-btn w-full px-3.5 py-2.5 flex items-center justify-between gap-2 text-left hover:bg-slate-100/80 transition"
+                aria-expanded="${isExpanded ? "true" : "false"}"
+              >
+                <div class="min-w-0">
+                  <div class="text-xs font-bold text-slate-800 truncate">
+                    📅 ${escapeHtml(item.date)}${carMeta}${timeMeta}
+                  </div>
+                  <div class="text-[11px] text-slate-500 font-medium">
+                    Заявок: ${item.jobsCount} · Сумма: ${formatMoney(item.totalMoney)} ₽
+                  </div>
+                </div>
+                <span class="text-xs font-bold text-slate-500 shrink-0">${isExpanded ? "▾" : "▸"}</span>
+              </button>
+              ${isExpanded ? `
+                <div class="px-3.5 pb-3 pt-1 border-t border-slate-200/70 bg-white space-y-2">
+                  <textarea
+                    rows="10"
+                    readonly
+                    class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-[11px] leading-relaxed text-slate-800 font-mono focus:outline-none"
+                  >${escapeHtml(item.text)}</textarea>
+                  <div class="flex justify-end">
+                    <button
+                      type="button"
+                      data-copy-archive-id="${escapeHtml(item.id)}"
+                      class="archive-copy-btn px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold transition"
+                    >
+                      📋 Копировать отчёт
+                    </button>
+                  </div>
+                </div>
+              ` : ""}
+            </div>
+          `;
+        }).join("");
+      }
+
+      // Копирует текст в буфер обмена
+      async function copyTextToClipboard(text, successMsg) {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+            showToast(successMsg || "Отчёт скопирован в буфер обмена", "success");
+            return;
+          }
+        } catch (err) {
+          // Используем запасной способ через временное поле
+        }
+
+        const temp = document.createElement("textarea");
+        temp.value = text;
+        temp.setAttribute("readonly", "");
+        temp.style.position = "fixed";
+        temp.style.opacity = "0";
+        document.body.appendChild(temp);
+        temp.select();
+        try {
+          document.execCommand("copy");
+          showToast(successMsg || "Отчёт скопирован в буфер обмена", "success");
+        } catch (err) {
+          showToast("Не удалось скопировать автоматически", "warn");
+        } finally {
+          document.body.removeChild(temp);
+        }
+      }
+
+      // Разбирает ссылку на сообщение/чат Telegram или Chat ID
+      function parseTelegramTarget(rawInput) {
+        const trimmed = String(rawInput || "").trim();
+        if (!trimmed) {
+          return { chatId: "", messageId: null, messageThreadId: null };
+        }
+
+        const msgLinkMatch = trimmed.match(/^(?:https?:\/\/)?t\.me\/c\/(\d+)\/(\d+)(?:\/(\d+))?(?:[/?#].*)?$/i);
+        if (msgLinkMatch) {
+          const internalChannelId = msgLinkMatch[1];
+          const secondNum = parseInt(msgLinkMatch[2], 10);
+          const thirdNum = msgLinkMatch[3] ? parseInt(msgLinkMatch[3], 10) : null;
+          return {
+            chatId: `-100${internalChannelId}`,
+            messageId: thirdNum || secondNum,
+            messageThreadId: thirdNum ? secondNum : null
+          };
+        }
+
+        const topicLinkMatch = trimmed.match(/^(?:https?:\/\/)?t\.me\/c\/(\d+)\/(\d+)(?:[/?#].*)?$/i);
+        if (topicLinkMatch) {
+          return {
+            chatId: `-100${topicLinkMatch[1]}`,
+            messageId: null,
+            messageThreadId: parseInt(topicLinkMatch[2], 10)
+          };
+        }
+
+        const publicMsgMatch = trimmed.match(/^(?:https?:\/\/)?t\.me\/([A-Za-z0-9_]+)\/(\d+)(?:[/?#].*)?$/i);
+        if (publicMsgMatch && publicMsgMatch[1].toLowerCase() !== "c") {
+          return {
+            chatId: `@${publicMsgMatch[1]}`,
+            messageId: parseInt(publicMsgMatch[2], 10),
+            messageThreadId: null
+          };
+        }
+
+        const topicQueryMatch = trimmed.match(/[?&]topic=(\d+)/i);
+        const threadId = topicQueryMatch ? parseInt(topicQueryMatch[1], 10) : null;
+
+        const cleanChat = trimmed
+          .replace(/^https?:\/\/t\.me\//i, "")
+          .replace(/^@?c\//i, "")
+          .split(/[/?#]/)[0]
+          .trim();
+
+        if (/^\d+$/.test(cleanChat)) {
+          return {
+            chatId: `-100${cleanChat}`,
+            messageId: null,
+            messageThreadId: threadId
+          };
+        }
+
+        return {
+          chatId: cleanChat,
+          messageId: null,
+          messageThreadId: threadId
+        };
+      }
+
+      function syncBotInputsToState() {
+        if (els.botTokenInput) {
+          state.bot.token = els.botTokenInput.value.trim();
+        }
+        if (els.botChatIdInput) {
+          const rawTarget = els.botChatIdInput.value.trim();
+          state.bot.chatId = rawTarget;
+          const parsed = parseTelegramTarget(rawTarget);
+          if (parsed.messageId && !state.bot.lastMessageId) {
+            state.bot.lastMessageId = parsed.messageId;
+          }
+        }
+        if (els.botAutoSendCheckbox) {
+          state.bot.autoSend = Boolean(els.botAutoSendCheckbox.checked);
+        }
+      }
+
+      function renderBotStatusHint(customText) {
+        if (!els.botStatusHint) return;
+        if (customText) {
+          els.botStatusHint.textContent = customText;
+          return;
+        }
+        const parsed = parseTelegramTarget(state.bot.chatId);
+        const targetLabel = parsed.chatId || "не задан";
+        const msgId = state.bot.lastMessageId || parsed.messageId;
+        if (state.bot.forceNewOnNextSend) {
+          els.botStatusHint.textContent = `Цель: ${targetLabel}. Следующая отправка создаст новое сообщение в чате.`;
+        } else if (msgId) {
+          els.botStatusHint.textContent = `Цель: ${targetLabel} · ID сообщения для обновления: #${msgId}.`;
+        } else {
+          els.botStatusHint.textContent = `Цель: ${targetLabel}. При первой отправке бот создаст сообщение и запомнит его ID для правок.`;
+        }
+      }
+
+      // Отправляет новый отчёт или редактирует существующее сообщение через Telegram Bot API
+      async function sendReportViaBotApi(options) {
+        const opts = options || {};
+        const silent = Boolean(opts.silent);
+        const forceNew = Boolean(opts.forceNew);
+
+        syncBotInputsToState();
+        const token = state.bot.token;
+        const parsedTarget = parseTelegramTarget(state.bot.chatId);
+        const chatId = parsedTarget.chatId;
+
+        if (!token || !chatId) {
+          saveState();
+          renderBotStatusHint();
+          if (!silent) {
+            showToast("Укажите Bot Token и ссылку или Chat ID в разделе «Настр.»", "warn");
+            switchTab("settings");
+          }
+          return false;
+        }
+
+        const text = buildReportText();
+        const shouldCreateNew = forceNew || Boolean(state.bot.forceNewOnNextSend);
+        const existingMsgId = shouldCreateNew ? null : (state.bot.lastMessageId || parsedTarget.messageId);
+
+        try {
+          if (existingMsgId) {
+            const editRes = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/editMessageText`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                chat_id: chatId,
+                message_id: existingMsgId,
+                text,
+                disable_web_page_preview: true
+              })
+            });
+            const editData = await editRes.json();
+            if (editRes.ok && editData.ok) {
+              state.bot.lastMessageId = existingMsgId;
+              state.bot.forceNewOnNextSend = false;
+              saveState();
+              renderBotStatusHint(`Обновлено сообщение #${existingMsgId} в чате ${chatId}.`);
+              if (!silent) {
+                showToast("Отчёт в Telegram обновлён", "success");
+              }
+              return true;
+            }
+
+            const errDesc = String((editData && editData.description) || "");
+            const isMessageUnmodified = errDesc.toLowerCase().indexOf("message is not modified") !== -1;
+            if (isMessageUnmodified) {
+              state.bot.forceNewOnNextSend = false;
+              saveState();
+              renderBotStatusHint(`Сообщение #${existingMsgId} уже актуально.`);
+              if (!silent) {
+                showToast("Изменений для обновления нет", "info");
+              }
+              return true;
+            }
+          }
+
+          const sendPayload = {
+            chat_id: chatId,
+            text,
+            disable_web_page_preview: true
+          };
+          if (parsedTarget.messageThreadId) {
+            sendPayload.message_thread_id = parsedTarget.messageThreadId;
+          }
+
+          const sendRes = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(sendPayload)
+          });
+          const sendData = await sendRes.json();
+
+          if (!sendRes.ok || !sendData.ok) {
+            const reason = (sendData && sendData.description) || `HTTP ${sendRes.status}`;
+            renderBotStatusHint(`Ошибка отправки: ${reason}`);
+            if (!silent) {
+              showToast(`Ошибка Telegram: ${reason}`, "warn");
+            }
+            return false;
+          }
+
+          const newMsgId = sendData.result && sendData.result.message_id ? sendData.result.message_id : null;
+          if (newMsgId) {
+            state.bot.lastMessageId = newMsgId;
+          }
+          state.bot.forceNewOnNextSend = false;
+          saveState();
+          renderBotStatusHint(
+            newMsgId
+              ? `Отправлено новое сообщение #${newMsgId} в чат ${chatId}.`
+              : `Отчёт отправлен в чат ${chatId}.`
+          );
+          if (!silent) {
+            showToast(existingMsgId ? "Создано новое сообщение с отчётом" : "Отчёт отправлен в Telegram-бот", "success");
+          }
+          return true;
+        } catch (err) {
+          renderBotStatusHint("Нет сети или запрос заблокирован браузером.");
+          if (!silent) {
+            showToast("Не удалось связаться с Telegram API", "warn");
+          }
+          return false;
+        }
+      }
+
+      // Автоматически отправляет/обновляет отчёт при изменении заявок, если включена автоотправка
+      function triggerAutoBotSyncIfEnabled() {
+        syncBotInputsToState();
+        saveState();
+        if (!state.bot.autoSend) return;
+        if (!state.bot.token || !state.bot.chatId) return;
+        sendReportViaBotApi({ silent: true });
+      }
+
+      // Открывает Telegram с готовым текстом отчёта
+      function openReportInTelegram() {
+        const text = buildReportText();
+        copyTextToClipboard(text, "Отчёт скопирован — вставьте его в нужный чат Telegram");
+        const url = `https://t.me/share/url?url=${encodeURIComponent(" ")}&text=${encodeURIComponent(text)}`;
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+
+      // Обновляет формулу расчёта выбранной услуги и количества
+      function updateServiceFormula() {
+        const services = getServicesList();
+        const selected = services.find((s) => s.id === state.selectedServiceId) || services[0];
+        const qty = Math.max(1, parseInt(state.serviceQty, 10) || 1);
         state.serviceQty = qty;
-        if (els.serviceQty && String(els.serviceQty.value) !== String(qty)) {
+        if (els.serviceQty && document.activeElement !== els.serviceQty) {
           els.serviceQty.value = String(qty);
         }
-        const total = qty * srv.price;
+        const unitPrice = selected ? parseNum(selected.price) : 0;
+        const total = Math.round((unitPrice * qty + Number.EPSILON) * 100) / 100;
         if (els.serviceCalcFormula) {
-          els.serviceCalcFormula.textContent = `${qty} × ${srv.price} ₽ = ${formatRub(total)}`;
+          els.serviceCalcFormula.textContent = `${qty} × ${formatMoney(unitPrice)} ₽ = ${formatMoney(total)} ₽`;
         }
       }
 
+      // Рендерит быстрые кнопки услуг и выпадающий список выбора услуги
+      function renderServiceSelector() {
+        const services = getServicesList();
+        if (!services.some((s) => s.id === state.selectedServiceId)) {
+          state.selectedServiceId = services[0].id;
+        }
+
+        if (els.quickServicesBar) {
+          els.quickServicesBar.innerHTML = services
+            .map((srv) => {
+              const isSelected = srv.id === state.selectedServiceId;
+              return `
+                <button
+                  type="button"
+                  data-service-id="${escapeHtml(srv.id)}"
+                  class="quick-srv-btn px-3 py-2 rounded-xl text-xs font-semibold border transition active:scale-95 ${
+                    isSelected
+                      ? "bg-blue-600 text-white border-blue-600 shadow-xs"
+                      : "bg-blue-50/70 hover:bg-blue-100/80 text-blue-900 border-blue-200/70"
+                  }"
+                >
+                  + ${escapeHtml(srv.name)} · ${formatMoney(srv.price)} ₽
+                </button>
+              `;
+            })
+            .join("");
+        }
+
+        if (els.serviceSelect) {
+          els.serviceSelect.innerHTML = services
+            .map(
+              (srv) =>
+                `<option value="${escapeHtml(srv.id)}" ${srv.id === state.selectedServiceId ? "selected" : ""}>${escapeHtml(srv.name)} — ${formatMoney(srv.price)} ₽</option>`
+            )
+            .join("");
+        }
+
+        updateServiceFormula();
+      }
+
+      // Подтверждает выбранную услугу и количество, добавляя строку (сперва сумма, потом описание) в окошко позиций
       function confirmSelectedService() {
-        const srv = getSelectedService();
-        const qty = Math.max(1, Math.floor(parseNum(els.serviceQty ? els.serviceQty.value : state.serviceQty) || 1));
+        const services = getServicesList();
+        const selected = services.find((s) => s.id === state.selectedServiceId) || services[0];
+        if (!selected) return;
+
+        const qty = Math.max(1, parseInt(els.serviceQty ? els.serviceQty.value : state.serviceQty, 10) || 1);
         state.serviceQty = qty;
-        const lineTotal = qty * srv.price;
-        const descPart = qty > 1 ? `${srv.name} × ${qty}` : srv.name;
-        const lineText = `${lineTotal} ₽ — ${descPart}`;
+        const unitPrice = parseNum(selected.price);
+        const lineSum = Math.round((unitPrice * qty + Number.EPSILON) * 100) / 100;
+        const qtyPart = qty > 1 ? ` × ${qty}` : "";
+        const formattedLine = `${formatMoney(lineSum)} ₽ — ${selected.name}${qtyPart}`;
 
         if (els.jobSelectedItemsBox) {
           const current = (els.jobSelectedItemsBox.value || "").trim();
-          els.jobSelectedItemsBox.value = current ? `${current}\n${lineText}` : lineText;
+          els.jobSelectedItemsBox.value = current ? `${current}\n${formattedLine}` : formattedLine;
           resizeSelectedItemsBox();
         }
 
         const totalItemsSum = parseSelectedItemsSum();
         if (els.jobServices) {
           els.jobServices.value = String(totalItemsSum);
+        }
+        if (els.jobFromAcc) {
+          els.jobFromAcc.value = "";
         }
 
         const cashVal = parseNum(els.jobCashReceived ? els.jobCashReceived.value : 0);
@@ -1140,195 +2304,50 @@
 
         updatePaymentCalculationPreview();
         saveState();
-        showToast(`Добавлено: ${lineText}`, "success");
+        showToast(`Добавлено: ${formattedLine}`, "success");
       }
 
-      function applyCashPaymentLogic() {
-        const servicesVal = getCurrentServicesAmount();
-        const cashReceived = parseNum(els.jobCashReceived ? els.jobCashReceived.value : 0);
+      // Рендерит список услуг и расходников в настройках с возможностью редактирования и удаления
+      function renderServicesSettings() {
+        if (!els.servicesListView) return;
+        const services = getServicesList();
 
-        if (els.jobServices) {
-          els.jobServices.value = String(servicesVal);
-        }
-        if (els.jobFromAcc) {
-          els.jobFromAcc.value = "";
-        }
-
-        if (cashReceived > servicesVal) {
-          const remainder = cashReceived - servicesVal;
-          if (els.jobToAcc) els.jobToAcc.value = String(remainder);
-          showToast(`Наличными: услуги ${formatRub(servicesVal)}, на счёт ${formatRub(remainder)}`, "success");
-        } else {
-          if (els.jobToAcc) els.jobToAcc.value = "0";
-          showToast(`Наличными: ${formatRub(cashReceived > 0 ? cashReceived : servicesVal)} (на счёт 0 ₽)`, "info");
-        }
-
-        updatePaymentCalculationPreview();
-      }
-
-      function applyAccountPaymentLogic() {
-        const totalCharge = getCurrentServicesAmount();
-        if (els.jobFromAcc) els.jobFromAcc.value = String(totalCharge);
-        if (els.jobServices) els.jobServices.value = "0";
-        if (els.jobToAcc) els.jobToAcc.value = "0";
-        if (els.jobCashReceived) els.jobCashReceived.value = "";
-
-        updatePaymentCalculationPreview();
-        showToast(`Посчитано со счёта: ${formatRub(totalCharge)}`, "success");
-      }
-
-      function computeTotals() {
-        let totalFromAcc = 0;
-        let totalServices = 0;
-        let totalToAcc = 0;
-
-        state.jobs.forEach((job) => {
-          totalFromAcc += parseNum(job.fromAcc);
-          totalServices += parseNum(job.services);
-          totalToAcc += parseNum(job.toAcc);
-        });
-
-        return {
-          totalFromAcc,
-          totalServices,
-          totalToAcc,
-          totalCombined: totalServices + totalToAcc
-        };
-      }
-
-      function buildReportText() {
-        const totals = computeTotals();
-        const startKm = parseNum(state.shift.startKm);
-        const endKm = parseNum(state.shift.endKm);
-        const mileageText = (state.shift.startKm !== "" && state.shift.endKm !== "" && endKm >= startKm)
-          ? `${endKm - startKm} км`
-          : "0 км";
-
-        let text = "📝 ОТЧЁТ (PMH)\n";
-        text += `🗓 Дата: ${(state.shift.date || "—").trim()}\n`;
-        text += `👤 Менеджер: ${(state.shift.manager || "—").trim()}\n`;
-        text += `👷 Монтажники: ${(state.shift.installers || "—").trim()}\n`;
-        text += `🚌 Номер авто: ${(state.shift.carNumber || "—").trim()}\n`;
-        text += `🚗 Пробег за день: ${mileageText}\n`;
-
-        const fuelType = (state.shift.fuelType || "").trim();
-        const fuelValue = (state.shift.fuelValue || "").trim();
-        const fuelIconMap = { "АИ-92": "⛽️", "Метан": "💎", "Пропан": "💧" };
-        if (fuelType && fuelValue) {
-          const icon = fuelIconMap[fuelType] || "⛽️";
-          text += `${icon} Заправка ${fuelType}: ${fuelValue}\n`;
-        }
-
-        const extraFuels = Array.isArray(state.shift.extraFuels) ? state.shift.extraFuels : [];
-        extraFuels.forEach((item) => {
-          const fType = (item.fuelType || "").trim();
-          const fVal = (item.fuelValue || "").trim();
-          if (fType && fVal) {
-            const icon = fuelIconMap[fType] || "⛽️";
-            text += `${icon} Заправка ${fType}: ${fVal}\n`;
-          }
-        });
-
-        text += "\n📌 Заявки:\n";
-
-        state.jobs.forEach((job, idx) => {
-          const num = idx + 1;
-          const address = (job.address || "").replace(/[\r\n\s]+/g, " ").trim() || "[Без адреса]";
-          const mFrom = parseNum(job.fromAcc);
-          const mServ = parseNum(job.services);
-          const mTo = parseNum(job.toAcc);
-          const combined = mServ + mTo;
-
-          text += `\n${num}. 📍 ${address}\n`;
-          if (job.selectedItems) {
-            text += `${job.selectedItems.trim()}\n`;
-          }
-          if (job.description) {
-            text += `${job.description.trim()}\n`;
-          }
-          if (mFrom !== 0) text += `▪️ Со счета: ${formatRub(mFrom)}\n`;
-          if (mServ !== 0) text += `▪️ Услуги: ${formatRub(mServ)}\n`;
-          if (mTo !== 0) text += `▪️ На счет: ${formatRub(mTo)}\n`;
-          if (combined > 0) text += `🔻 Итого по заявке: ${formatRub(combined)}\n`;
-          if (job.time) text += `🕒 Время окончания: ${job.time.trim()}\n`;
-        });
-
-        text += "\n💰 ФИНАНСЫ за день:\n";
-        text += `▪️ со счета: ${formatRub(totals.totalFromAcc)}\n`;
-        text += `▪️ услуги: ${formatRub(totals.totalServices)}\n`;
-        text += `▪️ на счет: ${formatRub(totals.totalToAcc)}\n`;
-        text += `💵 общая (услуг и на счет): ${formatRub(totals.totalCombined)}\n`;
-
-        return text;
-      }
-
-      function renderServicesControls() {
-        const servicesList = getServicesList();
-
-        if (els.quickServicesBar) {
-          els.quickServicesBar.innerHTML = servicesList.map((srv) => {
-            const active = srv.id === state.selectedServiceId;
-            return `
-              <button
-                type="button"
-                data-srv-id="${escapeHtml(srv.id)}"
-                class="quick-srv-btn px-3 py-1.5 rounded-full text-xs font-semibold border transition ${
-                  active
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-blue-50/80 hover:bg-blue-100 text-blue-700 border-blue-200/80"
-                }"
-              >
-                + ${escapeHtml(srv.name)} · ${escapeHtml(String(srv.price))} ₽
-              </button>
-            `;
-          }).join("");
-        }
-
-        if (els.serviceSelect) {
-          els.serviceSelect.innerHTML = servicesList.map((srv) => {
-            const selected = srv.id === state.selectedServiceId ? "selected" : "";
-            return `<option value="${escapeHtml(srv.id)}" ${selected}>${escapeHtml(srv.name)} (${escapeHtml(String(srv.price))} ₽)</option>`;
-          }).join("");
-        }
-
-        if (els.servicesListView) {
-          els.servicesListView.innerHTML = servicesList.map((srv) => {
+        els.servicesListView.innerHTML = services
+          .map((srv) => {
             if (editingServiceId === srv.id) {
               return `
-                <li class="py-2.5 space-y-2" data-edit-srv-row="${escapeHtml(srv.id)}">
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <li class="py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <input
                       type="text"
-                      data-edit-srv-name
+                      data-edit-srv-name="${escapeHtml(srv.id)}"
                       value="${escapeHtml(srv.name)}"
-                      placeholder="Название услуги"
-                      class="sm:col-span-2 px-3 py-2 rounded-xl border border-blue-400 bg-white focus:border-blue-600 focus:outline-none text-xs font-medium text-slate-900"
+                      class="sm:col-span-2 px-2.5 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-medium focus:outline-none"
                     />
                     <input
                       type="number"
                       inputmode="numeric"
                       min="0"
                       step="any"
-                      data-edit-srv-price
+                      data-edit-srv-price="${escapeHtml(srv.id)}"
                       value="${escapeHtml(String(srv.price))}"
-                      placeholder="Цена ₽"
-                      class="w-full px-3 py-2 rounded-xl border border-blue-400 bg-white focus:border-blue-600 focus:outline-none text-xs font-bold text-slate-900"
+                      class="px-2.5 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-semibold focus:outline-none"
                     />
                   </div>
-                  <div class="flex items-center justify-end gap-1.5">
-                    <button
-                      type="button"
-                      data-cancel-srv-id="${escapeHtml(srv.id)}"
-                      class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition"
-                    >
-                      Отмена
-                    </button>
+                  <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
                     <button
                       type="button"
                       data-save-srv-id="${escapeHtml(srv.id)}"
-                      class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition"
+                      class="save-srv-btn px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold"
                     >
                       Сохранить
+                    </button>
+                    <button
+                      type="button"
+                      data-cancel-srv-id="${escapeHtml(srv.id)}"
+                      class="cancel-srv-btn px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold"
+                    >
+                      Отмена
                     </button>
                   </div>
                 </li>
@@ -1338,415 +2357,328 @@
             return `
               <li class="py-2.5 flex items-center justify-between gap-2">
                 <div class="min-w-0">
-                  <span class="font-semibold text-slate-800 block truncate">${escapeHtml(srv.name)}</span>
-                  <span class="text-xs font-bold text-blue-700">${escapeHtml(formatRub(srv.price))}</span>
+                  <p class="font-semibold text-slate-800 truncate">${escapeHtml(srv.name)}</p>
+                  <p class="text-slate-500 font-medium">${formatMoney(srv.price)} ₽</p>
                 </div>
                 <div class="flex items-center gap-1.5 shrink-0">
                   <button
                     type="button"
                     data-edit-srv-id="${escapeHtml(srv.id)}"
-                    class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 text-xs font-semibold transition"
-                    title="Редактировать услугу"
-                  >
-                    ✏️
-                  </button>
-                  ${
-                    servicesList.length > 1
-                      ? `<button
-                          type="button"
-                          data-delete-srv-id="${escapeHtml(srv.id)}"
-                          class="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 text-xs font-semibold transition"
-                          title="Удалить услугу"
-                        >
-                          🗑
-                        </button>`
-                      : ""
-                  }
-                </div>
-              </li>
-            `;
-          }).join("");
-        }
-
-        updateServiceFormulaPreview();
-      }
-
-      function renderBotSettingsUI() {
-        const rawTarget = (state.bot && state.bot.chatId) || "";
-        const parsedTarget = parseTelegramTarget(rawTarget);
-        const isForceNew = Boolean(state.bot && state.bot.forceNewOnNextSend);
-        const trackedMsgId = isForceNew ? null : ((state.bot && state.bot.lastMessageId) || parsedTarget.messageId || null);
-        const autoSendEnabled = state.bot ? state.bot.autoSend !== false : true;
-
-        if (els.botTokenInput) {
-          els.botTokenInput.value = (state.bot && state.bot.token) || "";
-        }
-        if (els.botChatIdInput) {
-          els.botChatIdInput.value = rawTarget;
-        }
-        if (els.botAutoSendCheckbox) {
-          els.botAutoSendCheckbox.checked = autoSendEnabled;
-        }
-        if (els.botStatusHint) {
-          const hasToken = Boolean(((state.bot && state.bot.token) || "").trim());
-          const msgInfo = trackedMsgId ? ` Будет обновляться сообщение #${trackedMsgId}.` : " При первой отправке создастся новое сообщение.";
-          if (!rawTarget) {
-            els.botStatusHint.textContent = "Укажите Bot Token и ссылку на сообщение/чат или Chat ID.";
-          } else if (parsedTarget.isLink) {
-            const topicPart = parsedTarget.threadId ? `, тема #${parsedTarget.threadId}` : "";
-            els.botStatusHint.textContent = hasToken
-              ? `Распознано: Chat ID ${parsedTarget.chatId}${topicPart}.${msgInfo}`
-              : `Распознано: Chat ID ${parsedTarget.chatId}${topicPart}. Укажите Bot Token.`;
-          } else {
-            els.botStatusHint.textContent = hasToken
-              ? `Бот настроен: Chat ID ${parsedTarget.chatId}.${msgInfo}`
-              : "Укажите Bot Token для отправки через Telegram Bot API.";
-          }
-        }
-      }
-
-      async function sendReportThroughBotApi(forceNewMessage = false, options = {}) {
-        const silentMissingConfig = Boolean(options.silentMissingConfig);
-        const autoTrigger = Boolean(options.autoTrigger);
-        const token = (els.botTokenInput ? els.botTokenInput.value : state.bot.token || "").trim();
-        const rawChatInput = (els.botChatIdInput ? els.botChatIdInput.value : state.bot.chatId || "").trim();
-        const target = parseTelegramTarget(rawChatInput);
-
-        state.bot = {
-          ...(state.bot || {}),
-          token,
-          chatId: rawChatInput
-        };
-        saveState();
-        renderBotSettingsUI();
-
-        if (!token || !target.chatId) {
-          if (!silentMissingConfig) {
-            showToast("Введите Bot Token и ссылку или Chat ID в разделе «Настр.»", "warn");
-          }
-          return false;
-        }
-
-        const reportText = buildReportText().trim();
-        if (!reportText) {
-          if (!silentMissingConfig) showToast("Отчёт пуст", "warn");
-          return false;
-        }
-
-        const existingMsgId = (!forceNewMessage && !(state.bot && state.bot.forceNewOnNextSend))
-          ? ((state.bot && state.bot.lastMessageId) || target.messageId || null)
-          : null;
-
-        try {
-          if (existingMsgId) {
-            if (!autoTrigger) {
-              showToast(`Обновление сообщения #${existingMsgId}...`, "info");
-            }
-            const editEndpoint = `https://api.telegram.org/bot${encodeURIComponent(token)}/editMessageText`;
-            const editPayload = {
-              chat_id: target.chatId,
-              message_id: Number(existingMsgId),
-              text: reportText
-            };
-
-            const editRes = await fetch(editEndpoint, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(editPayload)
-            });
-            const editData = await editRes.json();
-
-            if (editRes.ok && editData.ok) {
-              state.bot.lastMessageId = Number(existingMsgId);
-              state.bot.forceNewOnNextSend = false;
-              saveState();
-              renderBotSettingsUI();
-              showToast(
-                autoTrigger
-                  ? `✓ Заявка сохранена, отчёт #${existingMsgId} обновлён в боте`
-                  : `✓ Сообщение #${existingMsgId} обновлено`,
-                "success"
-              );
-              return true;
-            }
-
-            const errDesc = String((editData && editData.description) || "");
-            if (errDesc.toLowerCase().indexOf("message is not modified") !== -1) {
-              if (!autoTrigger) {
-                showToast("Отчёт уже актуален, изменений нет", "info");
-              }
-              return true;
-            }
-
-            if (!autoTrigger) {
-              showToast("Не удалось отредактировать старое сообщение, отправляю новое...", "info");
-            }
-          } else if (!autoTrigger) {
-            showToast("Отправка нового отчёта ботом...", "info");
-          }
-
-          const sendEndpoint = `https://api.telegram.org/bot${encodeURIComponent(token)}/sendMessage`;
-          const sendPayload = {
-            chat_id: target.chatId,
-            text: reportText
-          };
-          if (target.threadId) {
-            sendPayload.message_thread_id = target.threadId;
-          }
-
-          const response = await fetch(sendEndpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(sendPayload)
-          });
-          const data = await response.json();
-          if (!response.ok || !data.ok) {
-            throw new Error((data && data.description) || `HTTP ${response.status}`);
-          }
-          if (data.result && data.result.message_id) {
-            state.bot.lastMessageId = data.result.message_id;
-            state.bot.forceNewOnNextSend = false;
-            saveState();
-            renderBotSettingsUI();
-          }
-          showToast(
-            autoTrigger
-              ? "✓ Заявка сохранена и отправлена в Telegram-бот"
-              : "✓ Отчёт отправлен в Telegram через бота",
-            "success"
-          );
-          return true;
-        } catch (err) {
-          showToast("Не удалось отправить/обновить через Bot API. Проверьте токен, права бота и ссылку/ID", "warn");
-          return false;
-        }
-      }
-
-      function renderShiftUI() {
-        els.inputDate.value = state.shift.date || "";
-        els.inputManager.value = state.shift.manager || "";
-        els.inputInstallers.value = state.shift.installers || "";
-        els.inputCarNumber.value = state.shift.carNumber || "";
-        els.inputStartKm.value = state.shift.startKm !== undefined ? state.shift.startKm : "";
-        els.inputEndKm.value = state.shift.endKm !== undefined ? state.shift.endKm : "";
-        if (els.inputFuelType) els.inputFuelType.value = state.shift.fuelType || "";
-        if (els.inputFuelValue) els.inputFuelValue.value = state.shift.fuelValue || "";
-
-        const startKm = parseNum(state.shift.startKm);
-        const endKm = parseNum(state.shift.endKm);
-        const diff = (state.shift.startKm !== "" && state.shift.endKm !== "" && endKm >= startKm)
-          ? `${endKm - startKm} км`
-          : "0 км";
-        els.dayMileageBadge.textContent = `Пробег: ${diff}`;
-      }
-
-      function renderJobsUI() {
-        const totals = computeTotals();
-        els.jobsCountBadge.textContent = String(state.jobs.length);
-        els.jobsTotalMini.textContent = `Итого: ${formatRub(totals.totalCombined)}`;
-        els.footerTotalMoney.textContent = formatRub(totals.totalCombined);
-
-        if (state.editingJobId) {
-          els.jobFormTitle.innerHTML = "<span>✏️</span><span>Редактирование заявки</span>";
-          els.btnSaveJob.textContent = "Сохранить изменения";
-          els.btnCancelEdit.classList.remove("hidden");
-        } else {
-          els.jobFormTitle.innerHTML = "<span>➕</span><span>Новая заявка</span>";
-          els.btnSaveJob.textContent = "+ Добавить заявку в список";
-          els.btnCancelEdit.classList.add("hidden");
-        }
-
-        if (state.jobs.length === 0) {
-          els.jobsListContainer.innerHTML = `
-            <div class="bg-white rounded-2xl p-6 border border-dashed border-slate-300 text-center space-y-1">
-              <p class="text-sm font-semibold text-slate-700">Заявок пока нет</p>
-              <p class="text-xs text-slate-500">Выберите услугу, нажмите «✓ Подтвердить» и добавьте заявку.</p>
-            </div>
-          `;
-          return;
-        }
-
-        els.jobsListContainer.innerHTML = state.jobs.map((job, idx) => {
-          const mFrom = parseNum(job.fromAcc);
-          const mServ = parseNum(job.services);
-          const mTo = parseNum(job.toAcc);
-          const combined = mServ + mTo;
-
-          const moneyParts = [];
-          if (mFrom !== 0) moneyParts.push(`Со счёта: ${formatRub(mFrom)}`);
-          if (mServ !== 0) moneyParts.push(`Услуги: ${formatRub(mServ)}`);
-          if (mTo !== 0) moneyParts.push(`На счёт: ${formatRub(mTo)}`);
-
-          return `
-            <div class="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-xs space-y-2">
-              <div class="flex items-start justify-between gap-2">
-                <div class="min-w-0">
-                  <p class="text-sm font-bold text-slate-900 break-words">
-                    ${idx + 1}. 📍 ${escapeHtml(job.address || "[Без адреса]")}
-                  </p>
-                  ${job.selectedItems ? `<p class="text-xs font-medium text-blue-800 bg-blue-50/80 rounded-xl px-2.5 py-1.5 mt-1.5 whitespace-pre-line break-words">${escapeHtml(job.selectedItems)}</p>` : ""}
-                  ${job.description ? `<p class="text-xs text-slate-600 mt-1 whitespace-pre-line break-words">${escapeHtml(job.description)}</p>` : ""}
-                </div>
-                <div class="flex items-center gap-1 shrink-0">
-                  <button
-                    type="button"
-                    data-action="edit"
-                    data-id="${job.id}"
-                    class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 text-xs font-semibold"
-                    title="Изменить"
+                    class="edit-srv-btn w-8 h-8 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 flex items-center justify-center transition"
+                    title="Редактировать"
                   >
                     ✏️
                   </button>
                   <button
                     type="button"
-                    data-action="delete"
-                    data-id="${job.id}"
-                    class="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 text-xs font-semibold"
+                    data-del-srv-id="${escapeHtml(srv.id)}"
+                    class="del-srv-btn w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center transition"
                     title="Удалить"
                   >
                     🗑
                   </button>
                 </div>
-              </div>
+              </li>
+            `;
+          })
+          .join("");
+      }
 
-              <div class="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-slate-100 text-xs">
-                <div class="flex flex-wrap items-center gap-2 text-slate-700">
-                  ${moneyParts.length ? `<span>${escapeHtml(moneyParts.join(" · "))}</span>` : `<span class="text-slate-400">Без оплаты</span>`}
-                  ${combined > 0 ? `<span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold">🔻 ${formatRub(combined)}</span>` : ""}
-                </div>
-                ${job.time ? `<span class="text-slate-500 font-medium">🕒 ${escapeHtml(job.time)}</span>` : ""}
-              </div>
-            </div>
+      // Рендерит список пользовательских пресетов в настройках
+      function renderPresetsSettings() {
+        if (!els.presetsListView) return;
+        const presets = getPresetsList();
+
+        if (presets.length === 0) {
+          els.presetsListView.innerHTML = `
+            <li class="py-3 text-center text-xs text-slate-400">
+              Список шаблонов пуст. Добавьте шаблон выше или нажмите «Сбросить».
+            </li>
           `;
-        }).join("");
-      }
-
-      function renderReportUI() {
-        if (els.reportOutput) {
-          els.reportOutput.value = buildReportText();
-        }
-      }
-
-      function renderExtraFuelsUI() {
-        if (!els.extraFuelsContainer) return;
-        const extraFuels = Array.isArray(state.shift.extraFuels) ? state.shift.extraFuels : [];
-        if (extraFuels.length === 0) {
-          els.extraFuelsContainer.innerHTML = "";
           return;
         }
 
-        els.extraFuelsContainer.innerHTML = extraFuels.map((fuel, idx) => `
-          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-[11px] font-bold text-slate-600">Ещё заправка #${idx + 2}</span>
-              <button
-                type="button"
-                data-remove-fuel-idx="${idx}"
-                class="text-[11px] font-semibold text-rose-600 hover:text-rose-700 px-2 py-0.5 rounded-lg bg-rose-50"
-              >
-                Удалить
-              </button>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <select
-                data-extra-fuel-type="${idx}"
-                class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:border-blue-500 focus:outline-none text-xs sm:text-sm"
-              >
-                <option value="" ${fuel.fuelType === "" ? "selected" : ""}>Выберите топливо</option>
-                <option value="АИ-92" ${fuel.fuelType === "АИ-92" ? "selected" : ""}>⛽️ Заправка АИ-92</option>
-                <option value="Метан" ${fuel.fuelType === "Метан" ? "selected" : ""}>💎 Заправка Метан</option>
-                <option value="Пропан" ${fuel.fuelType === "Пропан" ? "selected" : ""}>💧 Заправка Пропан</option>
-              </select>
-              <input
-                type="text"
-                data-extra-fuel-value="${idx}"
-                value="${escapeHtml(fuel.fuelValue || "")}"
-                placeholder="например, 15 м³ или 500 ₽"
-                class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:border-blue-500 focus:outline-none text-xs sm:text-sm"
-              />
-            </div>
-          </div>
-        `).join("");
+        els.presetsListView.innerHTML = presets
+          .map((preset) => {
+            if (editingPresetId === preset.id) {
+              return `
+                <li class="py-2.5 space-y-2">
+                  <input
+                    type="text"
+                    data-edit-preset-label="${escapeHtml(preset.id)}"
+                    value="${escapeHtml(preset.label)}"
+                    placeholder="Название кнопки"
+                    class="w-full px-2.5 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-semibold focus:outline-none"
+                  />
+                  <textarea
+                    rows="2"
+                    data-edit-preset-items="${escapeHtml(preset.id)}"
+                    placeholder="Позиции (каждая с новой строки)"
+                    class="w-full px-2.5 py-1.5 rounded-lg border border-blue-400 bg-white text-xs leading-relaxed focus:outline-none"
+                  >${escapeHtml((preset.items || []).join("\n"))}</textarea>
+                  <input
+                    type="text"
+                    data-edit-preset-comment="${escapeHtml(preset.id)}"
+                    value="${escapeHtml(preset.comment || "")}"
+                    placeholder="Комментарий по умолчанию"
+                    class="w-full px-2.5 py-1.5 rounded-lg border border-blue-400 bg-white text-xs focus:outline-none"
+                  />
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button
+                      type="button"
+                      data-save-preset-id="${escapeHtml(preset.id)}"
+                      class="save-preset-btn px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold"
+                    >
+                      Сохранить
+                    </button>
+                    <button
+                      type="button"
+                      data-cancel-preset-id="${escapeHtml(preset.id)}"
+                      class="cancel-preset-btn px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold"
+                    >
+                      Отмена
+                    </button>
+                  </div>
+                </li>
+              `;
+            }
+
+            const itemsSummary = (preset.items || []).join(" · ");
+            const commentSummary = preset.comment ? `Комментарий: ${preset.comment}` : "";
+            return `
+              <li class="py-2.5 flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <p class="font-semibold text-slate-800 truncate">⚡ ${escapeHtml(preset.label)}</p>
+                  <p class="text-blue-700 font-medium break-words">${escapeHtml(itemsSummary || "Без позиций")}</p>
+                  ${commentSummary ? `<p class="text-[11px] text-slate-500 break-words mt-0.5">${escapeHtml(commentSummary)}</p>` : ""}
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    data-edit-preset-id="${escapeHtml(preset.id)}"
+                    class="edit-preset-btn w-8 h-8 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 flex items-center justify-center transition"
+                    title="Редактировать шаблон"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    type="button"
+                    data-del-preset-id="${escapeHtml(preset.id)}"
+                    class="del-preset-btn w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center transition"
+                    title="Удалить шаблон"
+                  >
+                    🗑
+                  </button>
+                </div>
+              </li>
+            `;
+          })
+          .join("");
       }
 
-      function setActiveTab(tabName) {
-        const normalizedTab = tabName === "bot" ? "settings" : tabName;
-        state.activeTab = normalizedTab;
-        els.tabBtns.forEach((btn) => {
-          const active = btn.dataset.tab === normalizedTab;
-          btn.className = "tab-btn py-2 px-1 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1 " +
-            (active ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900");
-        });
-        Object.keys(els.tabPanels).forEach((key) => {
-          if (els.tabPanels[key]) {
-            els.tabPanels[key].classList.toggle("hidden", key !== normalizedTab);
-          }
-        });
-        if (normalizedTab === "report") {
-          renderReportUI();
-        } else if (normalizedTab === "settings") {
-          renderBotSettingsUI();
-          renderServicesControls();
-        }
-        saveState();
-      }
-
+      // Сбрасывает форму заявки в исходное состояние
       function resetJobForm() {
         state.editingJobId = null;
         if (els.jobForm) els.jobForm.reset();
-        if (els.jobDesc) {
-          els.jobDesc.value = "";
-          resizeJobDescBox();
-        }
+        if (els.jobFromAcc) els.jobFromAcc.value = "";
+        if (els.jobServices) els.jobServices.value = "";
+        if (els.jobToAcc) els.jobToAcc.value = "";
+        if (els.jobCashReceived) els.jobCashReceived.value = "";
         if (els.jobSelectedItemsBox) {
           els.jobSelectedItemsBox.value = "";
           resizeSelectedItemsBox();
         }
-        if (els.jobCashReceived) els.jobCashReceived.value = "";
-        if (els.jobFromAcc) els.jobFromAcc.value = "";
-        if (els.jobServices) els.jobServices.value = "";
-        if (els.jobToAcc) els.jobToAcc.value = "";
+        if (els.jobDesc) {
+          resizeJobDescBox();
+        }
+        state.serviceQty = 1;
+        if (els.serviceQty) els.serviceQty.value = "1";
+        updateServiceFormula();
         updatePaymentCalculationPreview();
+
+        if (els.jobFormTitle) {
+          els.jobFormTitle.innerHTML = "<span>➕</span><span>Новая заявка</span>";
+        }
+        if (els.btnSaveJob) {
+          els.btnSaveJob.textContent = "+ Добавить заявку в список";
+        }
+        if (els.btnCancelEdit) {
+          els.btnCancelEdit.classList.add("hidden");
+        }
+      }
+
+      // Загружает выбранную заявку в форму для редактирования
+      function startEditJob(jobId) {
+        const job = state.jobs.find((j) => j.id === jobId);
+        if (!job) return;
+
+        state.editingJobId = job.id;
+        if (els.jobAddress) els.jobAddress.value = job.address || "";
+        if (els.jobDesc) {
+          els.jobDesc.value = job.description || "";
+          resizeJobDescBox();
+        }
+        if (els.jobSelectedItemsBox) {
+          els.jobSelectedItemsBox.value = job.selectedItems || "";
+          resizeSelectedItemsBox();
+        }
+        if (els.jobFromAcc) els.jobFromAcc.value = job.fromAcc || "";
+        if (els.jobServices) els.jobServices.value = job.services || "";
+        if (els.jobToAcc) els.jobToAcc.value = job.toAcc || "";
+        if (els.jobCashReceived) {
+          const sVal = parseNum(job.services);
+          const tVal = parseNum(job.toAcc);
+          els.jobCashReceived.value = tVal > 0 ? String(sVal + tVal) : "";
+        }
+        if (els.jobTime) els.jobTime.value = job.time || "";
+        updatePaymentCalculationPreview();
+
+        if (els.jobFormTitle) {
+          els.jobFormTitle.innerHTML = "<span>✏️</span><span>Редактирование заявки</span>";
+        }
+        if (els.btnSaveJob) {
+          els.btnSaveJob.textContent = "💾 Сохранить изменения";
+        }
+        if (els.btnCancelEdit) {
+          els.btnCancelEdit.classList.remove("hidden");
+        }
+
+        switchTab("jobs");
+        if (els.jobAddress) els.jobAddress.focus();
+        showToast("Заявка загружена для редактирования", "info");
+      }
+
+      // Удаляет заявку из списка
+      function deleteJob(jobId) {
+        state.jobs = state.jobs.filter((j) => j.id !== jobId);
+        if (state.editingJobId === jobId) {
+          resetJobForm();
+        }
         renderJobsUI();
+        renderReport();
+        triggerAutoBotSyncIfEnabled();
+        showToast("Заявка удалена", "warn");
       }
 
-      async function copyText(text, successMessage) {
-        const clean = String(text || "");
-        if (!clean.trim()) {
-          showToast("Текст пуст", "warn");
-          return false;
+      // Рендерит карточки заявок за смену
+      function renderJobsList() {
+        if (!els.jobsListContainer) return;
+        if (!state.jobs.length) {
+          els.jobsListContainer.innerHTML = `
+            <div class="bg-white rounded-2xl p-6 border border-dashed border-slate-300 text-center space-y-1">
+              <p class="text-sm font-semibold text-slate-600">Заявок пока нет</p>
+              <p class="text-xs text-slate-400">Заполните форму выше и нажмите «Добавить заявку в список»</p>
+            </div>
+          `;
+          return;
         }
-        if (navigator.clipboard && window.isSecureContext) {
-          try {
-            await navigator.clipboard.writeText(clean);
-            showToast(successMessage || "✓ Скопировано", "success");
-            return true;
-          } catch (err) {
-            // Переходим к запасному способу через execCommand
-          }
-        }
-        try {
-          const temp = document.createElement("textarea");
-          temp.value = clean;
-          temp.setAttribute("readonly", "");
-          temp.style.position = "fixed";
-          temp.style.opacity = "0";
-          document.body.appendChild(temp);
-          temp.select();
-          temp.setSelectionRange(0, temp.value.length);
-          const ok = document.execCommand("copy");
-          document.body.removeChild(temp);
-          if (ok) {
-            showToast(successMessage || "✓ Скопировано", "success");
-            return true;
-          }
-        } catch (err) {
-          // Игнорируем ошибку буфера
-        }
-        showToast("Выделите текст и скопируйте вручную", "warn");
-        return false;
+
+        els.jobsListContainer.innerHTML = state.jobs
+          .map((job, idx) => {
+            const fromAcc = parseNum(job.fromAcc);
+            const srv = parseNum(job.services);
+            const toAcc = parseNum(job.toAcc);
+            const total = srv + toAcc;
+
+            const badges = [];
+            if (fromAcc > 0) badges.push(`<span class="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 font-semibold">Со счёта: ${formatMoney(fromAcc)} ₽</span>`);
+            if (srv > 0) badges.push(`<span class="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-semibold">Услуги: ${formatMoney(srv)} ₽</span>`);
+            if (toAcc > 0) badges.push(`<span class="px-2 py-0.5 rounded-lg bg-blue-50 text-blue-700 font-semibold">На счёт: ${formatMoney(toAcc)} ₽</span>`);
+
+            const itemsLines = job.selectedItems
+              ? job.selectedItems.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)
+              : [];
+
+            return `
+              <article class="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-xs space-y-2.5">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="text-xs font-bold text-blue-600">#${idx + 1}</span>
+                      <h4 class="text-sm font-bold text-slate-900 break-words">${escapeHtml(job.address)}</h4>
+                    </div>
+                    ${job.time ? `<p class="text-[11px] text-slate-400 font-medium mt-0.5">🕒 ${escapeHtml(job.time)}</p>` : ""}
+                  </div>
+                  <div class="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      data-edit-id="${escapeHtml(job.id)}"
+                      class="edit-job-btn w-8 h-8 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 flex items-center justify-center transition"
+                      title="Редактировать"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      type="button"
+                      data-del-id="${escapeHtml(job.id)}"
+                      class="del-job-btn w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center transition"
+                      title="Удалить"
+                    >
+                      🗑
+                    </button>
+                  </div>
+                </div>
+
+                ${job.description ? `<p class="text-xs text-slate-600 leading-relaxed break-words">${escapeHtml(job.description)}</p>` : ""}
+
+                ${
+                  itemsLines.length
+                    ? `<ul class="text-xs text-slate-700 bg-slate-50 rounded-xl px-3 py-2 space-y-1 border border-slate-100">
+                        ${itemsLines.map((line) => `<li class="break-words">• ${escapeHtml(line)}</li>`).join("")}
+                      </ul>`
+                    : ""
+                }
+
+                <div class="flex items-center justify-between gap-2 flex-wrap pt-1 border-t border-slate-100 text-[11px]">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    ${badges.length ? badges.join("") : `<span class="text-slate-400">Без оплаты</span>`}
+                  </div>
+                  <span class="font-bold text-slate-900">Итого: ${formatMoney(total)} ₽</span>
+                </div>
+              </article>
+            `;
+          })
+          .join("");
       }
 
+      // Обновляет список заявок и итоговые суммы
+      function renderJobsUI() {
+        renderJobsList();
+        const fin = computeFinanceTotals();
+        if (els.jobsCountBadge) els.jobsCountBadge.textContent = String(state.jobs.length);
+        if (els.jobsTotalMini) els.jobsTotalMini.textContent = `Итого: ${formatMoney(fin.grandTotal)} ₽`;
+        if (els.footerTotalMoney) els.footerTotalMoney.textContent = `${formatMoney(fin.grandTotal)} ₽`;
+        renderOneHandHelpers();
+      }
+
+      // Заполняет поля формы смены и настроек из состояния
+      function hydrateFormInputs() {
+        renderHeaderTodayBadge();
+        if (els.inputDate) els.inputDate.value = state.shift.date || "";
+        if (els.inputManager) els.inputManager.value = state.shift.manager || "";
+        if (els.inputInstallers) els.inputInstallers.value = state.shift.installers || "";
+        if (els.inputCarNumber) els.inputCarNumber.value = state.shift.carNumber || "";
+        if (els.inputStartKm) els.inputStartKm.value = state.shift.startKm || "";
+        if (els.inputEndKm) els.inputEndKm.value = state.shift.endKm || "";
+        if (els.inputFuelType) els.inputFuelType.value = state.shift.fuelType || "";
+        if (els.inputFuelValue) els.inputFuelValue.value = state.shift.fuelValue || "";
+        renderExtraFuels();
+
+        if (els.botTokenInput) els.botTokenInput.value = state.bot.token || "";
+        if (els.botChatIdInput) els.botChatIdInput.value = state.bot.chatId || "";
+        if (els.botAutoSendCheckbox) els.botAutoSendCheckbox.checked = state.bot.autoSend !== false;
+        renderBotStatusHint();
+
+        renderServiceSelector();
+        renderOneHandHelpers();
+        renderServicesSettings();
+        renderPresetsSettings();
+        updatePaymentCalculationPreview();
+        resizeSelectedItemsBox();
+        resizeJobDescBox();
+      }
+
+      // Сбрасывает визуальный прогресс удержания кнопки «Новый день»
       function resetNewDayHoldVisual() {
         if (newDayHoldTimer) {
           clearTimeout(newDayHoldTimer);
@@ -1756,6 +2688,7 @@
           cancelAnimationFrame(newDayRafId);
           newDayRafId = null;
         }
+        newDayHoldStart = 0;
         if (els.newDayProgressBar) {
           els.newDayProgressBar.style.width = "0%";
         }
@@ -1764,71 +2697,24 @@
         }
       }
 
-      function executeNewDayReset() {
-        const prevManager = state.shift.manager;
-        const prevInstallers = state.shift.installers;
-        const prevCar = state.shift.carNumber;
-        const prevEndKm = state.shift.endKm;
-        const prevServices = getServicesList().map((s) => ({ ...s }));
-        const prevBot = {
-          token: (state.bot && state.bot.token) || "",
-          chatId: (state.bot && state.bot.chatId) || "",
-          lastMessageId: null,
-          forceNewOnNextSend: true,
-          autoSend: state.bot ? state.bot.autoSend !== false : true
-        };
-
-        const def = createDefaultState();
-        state = {
-          ...def,
-          activeTab: "shift",
-          services: prevServices,
-          selectedServiceId: prevServices[0] ? prevServices[0].id : def.selectedServiceId,
-          bot: prevBot,
-          shift: {
-            ...def.shift,
-            manager: prevManager,
-            installers: prevInstallers,
-            carNumber: prevCar,
-            startKm: prevEndKm || "",
-            endKm: "",
-            fuelType: "",
-            fuelValue: "",
-            extraFuels: []
-          },
-          jobs: []
-        };
-
-        resetJobForm();
-        renderShiftUI();
-        renderExtraFuelsUI();
-        renderServicesControls();
-        renderBotSettingsUI();
-        renderJobsUI();
-        renderReportUI();
-        updatePaymentCalculationPreview();
-        saveState();
-        setActiveTab("shift");
-        showToast("Открыт новый день: заявки очищены, начальный км подставлен", "success");
-      }
-
-      function startNewDayHold(e) {
-        if (e && e.cancelable) e.preventDefault();
-        resetNewDayHoldVisual();
+      // Запускает отсчёт 3 секунд при удержании кнопки «Новый день»
+      function startNewDayHold() {
+        if (newDayHoldTimer) return;
         newDayTriggered = false;
-        newDayHoldStart = performance.now();
+        newDayHoldStart = Date.now();
 
-        const stepProgress = (now) => {
-          const elapsed = now - newDayHoldStart;
-          const pct = Math.min(100, Math.round((elapsed / NEW_DAY_HOLD_MS) * 100));
+        const stepProgress = () => {
+          if (!newDayHoldStart) return;
+          const elapsed = Date.now() - newDayHoldStart;
+          const pct = Math.min(100, (elapsed / NEW_DAY_HOLD_MS) * 100);
           if (els.newDayProgressBar) {
             els.newDayProgressBar.style.width = `${pct}%`;
           }
           const leftSec = Math.max(0.1, ((NEW_DAY_HOLD_MS - elapsed) / 1000)).toFixed(1);
-          if (els.newDayBtnLabel && !newDayTriggered) {
-            els.newDayBtnLabel.textContent = `Удерживайте ${leftSec}с...`;
+          if (els.newDayBtnLabel) {
+            els.newDayBtnLabel.textContent = `Удерживайте (${leftSec}с)...`;
           }
-          if (elapsed < NEW_DAY_HOLD_MS && !newDayTriggered) {
+          if (pct < 100 && newDayHoldStart) {
             newDayRafId = requestAnimationFrame(stepProgress);
           }
         };
@@ -1838,134 +2724,192 @@
         newDayHoldTimer = setTimeout(() => {
           newDayTriggered = true;
           resetNewDayHoldVisual();
-          executeNewDayReset();
+          startNewDay();
         }, NEW_DAY_HOLD_MS);
       }
 
-      function cancelNewDayHold() {
+      // Отменяет запуск «Нового дня», если кнопку отпустили раньше 3 секунд
+      function cancelNewDayHold(showHint) {
         if (!newDayHoldTimer && !newDayRafId) return;
-        const wasTriggered = newDayTriggered;
         resetNewDayHoldVisual();
-        if (!wasTriggered) {
-          showToast("Удерживайте кнопку «Новый день» 3 секунды", "info");
+        if (showHint && !newDayTriggered) {
+          showToast("Удерживайте кнопку 3 секунды для начала нового дня", "info");
         }
       }
 
-      function bindEvents() {
-        if (els.btnInstallPwaHeader) {
-          els.btnInstallPwaHeader.addEventListener("click", triggerPwaInstall);
-        }
+      // Открывает новый день: сохраняет отчёт прошлой смены в архив (до 15 по кругу), очищает заявки и пробег, сохраняя бригаду и авто
+      function startNewDay() {
+        const wasArchived = archiveCurrentShiftReport();
+        const today = getTodayFormatted();
+        const savedManager = state.shift.manager || "";
+        const savedInstallers = state.shift.installers || "";
+        const savedCarNumber = state.shift.carNumber || "";
+        const savedEndKm = state.shift.endKm || "";
+        const savedBot = {
+          ...state.bot,
+          lastMessageId: null,
+          forceNewOnNextSend: true
+        };
 
-        if (els.toastClose && els.toastBanner) {
+        state.shift = {
+          date: today,
+          manager: savedManager,
+          installers: savedInstallers,
+          carNumber: savedCarNumber,
+          startKm: savedEndKm,
+          endKm: "",
+          fuelType: "",
+          fuelValue: "",
+          extraFuels: []
+        };
+        state.jobs = [];
+        state.bot = savedBot;
+        resetJobForm();
+        hydrateFormInputs();
+        renderJobsUI();
+        renderReport();
+        saveState();
+        renderBotStatusHint("Новый день: прошлое сообщение отвязано, при отправке создастся новое.");
+        switchTab("shift");
+        showToast(
+          wasArchived
+            ? `Новый день (${today}): прошлый отчёт сохранён в архив`
+            : `Открыт новый день (${today})`,
+          "success"
+        );
+      }
+
+      // Навешивает обработчики событий на элементы интерфейса
+      function bindEvents() {
+        if (els.toastClose) {
           els.toastClose.addEventListener("click", () => {
             els.toastBanner.classList.add("hidden");
           });
         }
 
         els.tabBtns.forEach((btn) => {
-          btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
+          btn.addEventListener("click", () => switchTab(btn.dataset.tab));
         });
 
-        if (els.btnGoToJobs) {
-          els.btnGoToJobs.addEventListener("click", () => setActiveTab("jobs"));
+        if (els.btnNewDay) {
+          els.btnNewDay.addEventListener("pointerdown", (e) => {
+            if (e.button !== undefined && e.button !== 0) return;
+            startNewDayHold();
+          });
+          els.btnNewDay.addEventListener("pointerup", () => cancelNewDayHold(true));
+          els.btnNewDay.addEventListener("pointerleave", () => cancelNewDayHold(false));
+          els.btnNewDay.addEventListener("pointercancel", () => cancelNewDayHold(false));
+          els.btnNewDay.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (!newDayTriggered) {
+              showToast("Удерживайте кнопку 3 секунды для начала нового дня", "info");
+            }
+            newDayTriggered = false;
+          });
+        }
+
+        if (els.btnInstallPwaHeader) {
+          els.btnInstallPwaHeader.addEventListener("click", async () => {
+            if (!deferredInstallPrompt) return;
+            deferredInstallPrompt.prompt();
+            try {
+              await deferredInstallPrompt.userChoice;
+            } catch (err) {
+              // Игнорируем отмену диалога установки
+            }
+            deferredInstallPrompt = null;
+            els.btnInstallPwaHeader.classList.add("hidden");
+          });
         }
 
         if (els.btnSetToday) {
           els.btnSetToday.addEventListener("click", () => {
-            const now = new Date();
-            const dd = String(now.getDate()).padStart(2, "0");
-            const mm = String(now.getMonth() + 1).padStart(2, "0");
-            const yyyy = now.getFullYear();
-            state.shift.date = `${dd}.${mm}.${yyyy}`;
-            renderShiftUI();
+            const today = getTodayFormatted();
+            state.shift.date = today;
+            if (els.inputDate) els.inputDate.value = today;
             saveState();
-            showToast("Установлена сегодняшняя дата", "info");
+            renderReport();
+            showToast(`Установлена дата: ${today}`, "info");
           });
         }
 
-        const syncShift = () => {
-          state.shift.date = els.inputDate ? els.inputDate.value : "";
-          state.shift.manager = els.inputManager ? els.inputManager.value : "";
-          state.shift.installers = els.inputInstallers ? els.inputInstallers.value : "";
-          state.shift.carNumber = els.inputCarNumber ? els.inputCarNumber.value : "";
-          state.shift.startKm = els.inputStartKm ? els.inputStartKm.value : "";
-          state.shift.endKm = els.inputEndKm ? els.inputEndKm.value : "";
-          state.shift.fuelType = els.inputFuelType ? els.inputFuelType.value : "";
-          state.shift.fuelValue = els.inputFuelValue ? els.inputFuelValue.value : "";
-          renderShiftUI();
-          saveState();
-        };
+        if (els.btnGoToJobs) {
+          els.btnGoToJobs.addEventListener("click", () => switchTab("jobs"));
+        }
 
-        [
-          els.inputDate,
-          els.inputManager,
-          els.inputInstallers,
-          els.inputCarNumber,
-          els.inputStartKm,
-          els.inputEndKm,
-          els.inputFuelType,
-          els.inputFuelValue
-        ]
-          .filter(Boolean)
-          .forEach((input) => {
-            input.addEventListener("input", syncShift);
-            input.addEventListener("change", syncShift);
+        const shiftBindings = [
+          [els.inputDate, "date"],
+          [els.inputManager, "manager"],
+          [els.inputInstallers, "installers"],
+          [els.inputCarNumber, "carNumber"],
+          [els.inputStartKm, "startKm"],
+          [els.inputEndKm, "endKm"],
+          [els.inputFuelType, "fuelType"],
+          [els.inputFuelValue, "fuelValue"]
+        ];
+
+        shiftBindings.forEach(([input, key]) => {
+          if (!input) return;
+          const evtName = input.tagName === "SELECT" ? "change" : "input";
+          input.addEventListener(evtName, () => {
+            state.shift[key] = input.value;
+            saveState();
+            renderReport();
           });
+        });
 
         if (els.btnAddFuel) {
-          els.btnAddFuel.addEventListener("click", () => {
-            if (!Array.isArray(state.shift.extraFuels)) {
-              state.shift.extraFuels = [];
-            }
-            const usedMain = state.shift.fuelType;
-            const defaultNextType = usedMain === "Метан" || usedMain === "Пропан" ? "АИ-92" : "Метан";
-            state.shift.extraFuels.push({ fuelType: defaultNextType, fuelValue: "" });
-            renderExtraFuelsUI();
-            saveState();
-          });
+          els.btnAddFuel.addEventListener("click", addExtraFuelRow);
         }
 
         if (els.extraFuelsContainer) {
-          const handleExtraFuelChange = (e) => {
-            const typeIdx = e.target.getAttribute("data-extra-fuel-type");
-            const valIdx = e.target.getAttribute("data-extra-fuel-value");
-            if (!Array.isArray(state.shift.extraFuels)) return;
-
-            if (typeIdx !== null) {
-              const i = Number(typeIdx);
-              if (state.shift.extraFuels[i]) {
-                state.shift.extraFuels[i].fuelType = e.target.value;
-                saveState();
-              }
-            } else if (valIdx !== null) {
-              const i = Number(valIdx);
-              if (state.shift.extraFuels[i]) {
-                state.shift.extraFuels[i].fuelValue = e.target.value;
-                saveState();
-              }
-            }
-          };
-
-          els.extraFuelsContainer.addEventListener("input", handleExtraFuelChange);
-          els.extraFuelsContainer.addEventListener("change", handleExtraFuelChange);
-          els.extraFuelsContainer.addEventListener("click", (e) => {
-            const delBtn = e.target.closest("button[data-remove-fuel-idx]");
-            if (!delBtn || !Array.isArray(state.shift.extraFuels)) return;
-            const idx = Number(delBtn.dataset.removeFuelIdx);
-            state.shift.extraFuels.splice(idx, 1);
-            renderExtraFuelsUI();
+          els.extraFuelsContainer.addEventListener("input", (e) => {
+            const valInput = e.target.closest(".extra-fuel-val");
+            if (!valInput) return;
+            const fuelId = valInput.dataset.extraFuelValId;
+            const target = (state.shift.extraFuels || []).find((f) => f.id === fuelId);
+            if (!target) return;
+            target.fuelValue = valInput.value;
             saveState();
+            renderReport();
           });
+
+          els.extraFuelsContainer.addEventListener("change", (e) => {
+            const typeSelect = e.target.closest(".extra-fuel-type");
+            if (!typeSelect) return;
+            const fuelId = typeSelect.dataset.extraFuelTypeId;
+            const target = (state.shift.extraFuels || []).find((f) => f.id === fuelId);
+            if (!target) return;
+            target.fuelType = typeSelect.value;
+            saveState();
+            renderReport();
+          });
+
+          els.extraFuelsContainer.addEventListener("click", (e) => {
+            const delBtn = e.target.closest(".remove-fuel-btn");
+            if (!delBtn) return;
+            removeExtraFuelRow(delBtn.dataset.removeFuelId);
+          });
+        }
+
+        if (els.jobPresetsBar) {
+          els.jobPresetsBar.addEventListener("click", (e) => {
+            const presetBtn = e.target.closest(".job-preset-btn");
+            if (!presetBtn) return;
+            applyJobPreset(presetBtn.dataset.presetId);
+          });
+        }
+
+        if (els.btnRepeatLastJob) {
+          els.btnRepeatLastJob.addEventListener("click", repeatLastJob);
         }
 
         if (els.quickServicesBar) {
           els.quickServicesBar.addEventListener("click", (e) => {
-            const btn = e.target.closest("button[data-srv-id]");
+            const btn = e.target.closest(".quick-srv-btn");
             if (!btn) return;
-            state.selectedServiceId = btn.dataset.srvId;
-            state.serviceQty = 1;
-            if (els.serviceQty) els.serviceQty.value = "1";
-            renderServicesControls();
+            state.selectedServiceId = btn.dataset.serviceId;
+            renderServiceSelector();
             saveState();
           });
         }
@@ -1973,33 +2917,32 @@
         if (els.serviceSelect) {
           els.serviceSelect.addEventListener("change", () => {
             state.selectedServiceId = els.serviceSelect.value;
-            renderServicesControls();
+            renderServiceSelector();
             saveState();
           });
         }
 
         if (els.btnQtyMinus) {
           els.btnQtyMinus.addEventListener("click", () => {
-            const current = Math.max(1, Math.floor(parseNum(els.serviceQty ? els.serviceQty.value : state.serviceQty) || 1));
-            state.serviceQty = Math.max(1, current - 1);
-            if (els.serviceQty) els.serviceQty.value = String(state.serviceQty);
-            updateServiceFormulaPreview();
+            state.serviceQty = Math.max(1, (parseInt(state.serviceQty, 10) || 1) - 1);
+            updateServiceFormula();
+            saveState();
           });
         }
 
         if (els.btnQtyPlus) {
           els.btnQtyPlus.addEventListener("click", () => {
-            const current = Math.max(1, Math.floor(parseNum(els.serviceQty ? els.serviceQty.value : state.serviceQty) || 1));
-            state.serviceQty = current + 1;
-            if (els.serviceQty) els.serviceQty.value = String(state.serviceQty);
-            updateServiceFormulaPreview();
+            state.serviceQty = Math.max(1, (parseInt(state.serviceQty, 10) || 1) + 1);
+            updateServiceFormula();
+            saveState();
           });
         }
 
         if (els.serviceQty) {
           els.serviceQty.addEventListener("input", () => {
-            state.serviceQty = Math.max(1, Math.floor(parseNum(els.serviceQty.value) || 1));
-            updateServiceFormulaPreview();
+            state.serviceQty = Math.max(1, parseInt(els.serviceQty.value, 10) || 1);
+            updateServiceFormula();
+            saveState();
           });
         }
 
@@ -2013,9 +2956,9 @@
               els.jobSelectedItemsBox.value = "";
               resizeSelectedItemsBox();
             }
-            if (els.jobServices) els.jobServices.value = "0";
-            if (els.jobToAcc) els.jobToAcc.value = "0";
+            if (els.jobServices) els.jobServices.value = "";
             if (els.jobFromAcc) els.jobFromAcc.value = "";
+            if (els.jobToAcc) els.jobToAcc.value = "";
             updatePaymentCalculationPreview();
             showToast("Список выбранных позиций очищен", "info");
           });
@@ -2024,8 +2967,6 @@
         if (els.jobSelectedItemsBox) {
           els.jobSelectedItemsBox.addEventListener("input", () => {
             resizeSelectedItemsBox();
-            const itemsSum = parseSelectedItemsSum();
-            if (els.jobServices) els.jobServices.value = String(itemsSum);
             updatePaymentCalculationPreview();
           });
         }
@@ -2036,331 +2977,455 @@
 
         if (els.jobCashReceived) {
           els.jobCashReceived.addEventListener("input", () => {
-            const servicesVal = getCurrentServicesAmount();
-            const cashVal = parseNum(els.jobCashReceived.value);
-            if (els.jobToAcc) {
-              els.jobToAcc.value = cashVal > servicesVal ? String(cashVal - servicesVal) : "0";
-            }
+            if (els.jobFromAcc) els.jobFromAcc.value = "";
             updatePaymentCalculationPreview();
           });
         }
 
         if (els.btnPayCash) {
-          els.btnPayCash.addEventListener("click", applyCashPaymentLogic);
+          els.btnPayCash.addEventListener("click", applyCashPayment);
         }
 
         if (els.btnPayFromAccount) {
-          els.btnPayFromAccount.addEventListener("click", applyAccountPaymentLogic);
+          els.btnPayFromAccount.addEventListener("click", applyAccountPayment);
         }
 
         if (els.btnNowTime) {
           els.btnNowTime.addEventListener("click", () => {
-            const now = new Date();
-            const hh = String(now.getHours()).padStart(2, "0");
-            const mm = String(now.getMinutes()).padStart(2, "0");
-            const ss = String(now.getSeconds()).padStart(2, "0");
-            els.jobTime.value = `${hh}:${mm}:${ss}`;
+            if (els.jobTime) {
+              els.jobTime.value = getNowTimeFormatted();
+              showToast("Подставлено текущее время", "info");
+            }
           });
         }
 
         if (els.btnCancelEdit) {
-          els.btnCancelEdit.addEventListener("click", resetJobForm);
+          els.btnCancelEdit.addEventListener("click", () => {
+            resetJobForm();
+            showToast("Редактирование отменено", "info");
+          });
         }
 
         if (els.jobForm) {
-          els.jobForm.addEventListener("submit", async (e) => {
+          els.jobForm.addEventListener("submit", (e) => {
             e.preventDefault();
-            const address = els.jobAddress.value.trim();
+            const address = els.jobAddress ? els.jobAddress.value.trim() : "";
             if (!address) {
-              showToast("Укажите адрес заявки", "warn");
-              els.jobAddress.focus();
+              showToast("Укажите адрес или район заявки", "warn");
+              if (els.jobAddress) els.jobAddress.focus();
               return;
             }
 
-            const selectedItemsText = (els.jobSelectedItemsBox ? els.jobSelectedItemsBox.value : "").trim();
-            const itemsSum = parseSelectedItemsSum();
-            const explicitServices = parseNum(els.jobServices ? els.jobServices.value : 0);
-            const finalServices = explicitServices > 0 ? explicitServices : itemsSum;
-            const wasEditing = Boolean(state.editingJobId);
+            const selectedItemsText = els.jobSelectedItemsBox ? els.jobSelectedItemsBox.value.trim() : "";
+            const parsedItemsSum = parseSelectedItemsSum();
+            const cashReceived = parseNum(els.jobCashReceived ? els.jobCashReceived.value : 0);
+            const fromAccNum = parseNum(els.jobFromAcc ? els.jobFromAcc.value : 0);
 
-            const jobRecord = {
-              id: state.editingJobId || ("job_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6)),
+            let servicesVal = els.jobServices ? els.jobServices.value.trim() : "";
+            let toAccVal = els.jobToAcc ? els.jobToAcc.value.trim() : "";
+
+            if (fromAccNum === 0) {
+              if (parsedItemsSum > 0) {
+                servicesVal = String(parsedItemsSum);
+              }
+              if (cashReceived > 0) {
+                const effSrv = parsedItemsSum > 0 ? parsedItemsSum : cashReceived;
+                servicesVal = String(effSrv);
+                toAccVal = String(cashReceived > effSrv ? Math.round((cashReceived - effSrv + Number.EPSILON) * 100) / 100 : 0);
+              }
+            }
+
+            const jobPayload = {
+              id: state.editingJobId || `job_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
               address,
+              description: els.jobDesc ? els.jobDesc.value.trim() : "",
               selectedItems: selectedItemsText,
-              description: els.jobDesc.value.trim(),
-              fromAcc: els.jobFromAcc.value.trim(),
-              services: String(finalServices),
-              toAcc: els.jobToAcc.value.trim(),
-              time: els.jobTime.value.trim()
+              fromAcc: els.jobFromAcc ? els.jobFromAcc.value.trim() : "",
+              services: servicesVal,
+              toAcc: toAccVal,
+              time: els.jobTime ? els.jobTime.value.trim() : ""
             };
 
-            if (wasEditing) {
-              state.jobs = state.jobs.map((item) => (item.id === state.editingJobId ? jobRecord : item));
-              showToast("Заявка обновлена", "success");
+            const isEditing = Boolean(state.editingJobId);
+            if (isEditing) {
+              state.jobs = state.jobs.map((j) => (j.id === state.editingJobId ? jobPayload : j));
             } else {
-              state.jobs.push(jobRecord);
-              showToast("Заявка добавлена в список", "success");
+              state.jobs.push(jobPayload);
             }
 
+            rememberAddress(address);
             resetJobForm();
             renderJobsUI();
-            renderReportUI();
-            saveState();
-
-            if (!state.bot || state.bot.autoSend !== false) {
-              await sendReportThroughBotApi(false, {
-                silentMissingConfig: true,
-                autoTrigger: true
-              });
-            }
+            renderReport();
+            triggerAutoBotSyncIfEnabled();
+            showToast(isEditing ? "Заявка обновлена" : "Заявка добавлена в отчёт", "success");
           });
         }
 
         if (els.jobsListContainer) {
-          els.jobsListContainer.addEventListener("click", async (e) => {
-            const btn = e.target.closest("button[data-action]");
-            if (!btn) return;
-            const action = btn.dataset.action;
-            const id = btn.dataset.id;
-
-            if (action === "edit") {
-              const target = state.jobs.find((j) => j.id === id);
-              if (!target) return;
-              state.editingJobId = target.id;
-              els.jobAddress.value = target.address || "";
-              els.jobDesc.value = target.description || "";
-              resizeJobDescBox();
-              if (els.jobSelectedItemsBox) {
-                els.jobSelectedItemsBox.value = target.selectedItems || "";
-                resizeSelectedItemsBox();
-              }
-              els.jobFromAcc.value = target.fromAcc || "";
-              els.jobServices.value = target.services || "";
-              els.jobToAcc.value = target.toAcc || "";
-              if (els.jobCashReceived) {
-                const sVal = parseNum(target.services);
-                const tVal = parseNum(target.toAcc);
-                els.jobCashReceived.value = tVal > 0 ? String(sVal + tVal) : "";
-              }
-              els.jobTime.value = target.time || "";
-              updatePaymentCalculationPreview();
-              renderJobsUI();
-              els.jobAddress.focus();
-            } else if (action === "delete") {
-              if (state.editingJobId === id) {
-                resetJobForm();
-              }
-              state.jobs = state.jobs.filter((j) => j.id !== id);
-              renderJobsUI();
-              renderReportUI();
-              saveState();
-              showToast("Заявка удалена", "info");
-
-              if (!state.bot || state.bot.autoSend !== false) {
-                await sendReportThroughBotApi(false, {
-                  silentMissingConfig: true,
-                  autoTrigger: true
-                });
-              }
+          els.jobsListContainer.addEventListener("click", (e) => {
+            const editBtn = e.target.closest(".edit-job-btn");
+            if (editBtn) {
+              startEditJob(editBtn.dataset.editId);
+              return;
+            }
+            const delBtn = e.target.closest(".del-job-btn");
+            if (delBtn) {
+              deleteJob(delBtn.dataset.delId);
             }
           });
         }
 
-        if (els.btnNewDay) {
-          els.btnNewDay.addEventListener("mousedown", startNewDayHold);
-          els.btnNewDay.addEventListener("touchstart", startNewDayHold, { passive: false });
-          ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach((evtName) => {
-            els.btnNewDay.addEventListener(evtName, cancelNewDayHold);
+        if (els.reportArchiveList) {
+          els.reportArchiveList.addEventListener("click", (e) => {
+            const copyBtn = e.target.closest(".archive-copy-btn");
+            if (copyBtn) {
+              const entry = (state.reportArchive || []).find((a) => a.id === copyBtn.dataset.copyArchiveId);
+              if (entry && entry.text) {
+                copyTextToClipboard(entry.text, `Отчёт за ${entry.date} скопирован`);
+              }
+              return;
+            }
+
+            const toggleBtn = e.target.closest(".archive-toggle-btn");
+            if (toggleBtn) {
+              const targetId = toggleBtn.dataset.toggleArchiveId;
+              expandedArchiveId = expandedArchiveId === targetId ? null : targetId;
+              renderReportArchive();
+            }
           });
         }
 
-        const syncBotInputs = () => {
-          state.bot = {
-            ...(state.bot || {}),
-            token: (els.botTokenInput ? els.botTokenInput.value : "").trim(),
-            chatId: (els.botChatIdInput ? els.botChatIdInput.value : "").trim(),
-            autoSend: els.botAutoSendCheckbox ? els.botAutoSendCheckbox.checked : true
-          };
-          saveState();
-          renderBotSettingsUI();
-        };
-
-        if (els.botTokenInput) {
-          els.botTokenInput.addEventListener("input", syncBotInputs);
-          els.botTokenInput.addEventListener("change", syncBotInputs);
+        if (els.btnCopyReportTab) {
+          els.btnCopyReportTab.addEventListener("click", () => {
+            copyTextToClipboard(buildReportText(), "Готовый отчёт скопирован");
+          });
         }
 
-        if (els.botChatIdInput) {
-          els.botChatIdInput.addEventListener("input", syncBotInputs);
-          els.botChatIdInput.addEventListener("change", syncBotInputs);
-        }
-
-        if (els.botAutoSendCheckbox) {
-          els.botAutoSendCheckbox.addEventListener("change", syncBotInputs);
-        }
-
-        if (els.btnSendViaBotApi) {
-          els.btnSendViaBotApi.addEventListener("click", () => sendReportThroughBotApi(false));
+        if (els.btnQuickCopy) {
+          els.btnQuickCopy.addEventListener("click", () => {
+            copyTextToClipboard(buildReportText(), "Отчёт скопирован в буфер обмена");
+          });
         }
 
         if (els.btnFooterSendBot) {
-          els.btnFooterSendBot.addEventListener("click", () => sendReportThroughBotApi(false));
+          els.btnFooterSendBot.addEventListener("click", () => {
+            sendReportViaBotApi({ silent: false });
+          });
+        }
+
+        if (els.botTokenInput) {
+          els.botTokenInput.addEventListener("input", () => {
+            syncBotInputsToState();
+            saveState();
+          });
+        }
+
+        if (els.botChatIdInput) {
+          els.botChatIdInput.addEventListener("input", () => {
+            syncBotInputsToState();
+            saveState();
+            renderBotStatusHint();
+          });
+        }
+
+        if (els.botAutoSendCheckbox) {
+          els.botAutoSendCheckbox.addEventListener("change", () => {
+            syncBotInputsToState();
+            saveState();
+            showToast(
+              state.bot.autoSend ? "Автоотправка в бот включена" : "Автоотправка в бот отключена",
+              "info"
+            );
+          });
+        }
+
+        if (els.btnSendViaBotApi) {
+          els.btnSendViaBotApi.addEventListener("click", () => {
+            sendReportViaBotApi({ silent: false });
+          });
         }
 
         if (els.btnSendNewBotMessage) {
-          els.btnSendNewBotMessage.addEventListener("click", () => sendReportThroughBotApi(true));
+          els.btnSendNewBotMessage.addEventListener("click", () => {
+            sendReportViaBotApi({ silent: false, forceNew: true });
+          });
         }
 
         if (els.btnResetBotMsgId) {
           els.btnResetBotMsgId.addEventListener("click", () => {
-            state.bot = {
-              ...(state.bot || {}),
-              lastMessageId: null,
-              forceNewOnNextSend: true
-            };
+            state.bot.lastMessageId = null;
+            state.bot.forceNewOnNextSend = true;
             saveState();
-            renderBotSettingsUI();
-            showToast("ID сообщения сброшен — следующая отправка создаст новое", "info");
+            renderBotStatusHint("ID сообщения сброшен. Следующая отправка создаст новое сообщение.");
+            showToast("ID сообщения сброшен", "info");
           });
+        }
+
+        if (els.btnOpenTelegram) {
+          els.btnOpenTelegram.addEventListener("click", openReportInTelegram);
         }
 
         if (els.addServiceForm) {
           els.addServiceForm.addEventListener("submit", (e) => {
             e.preventDefault();
-            const name = (els.newServiceName ? els.newServiceName.value : "").trim();
-            const price = els.newServicePrice ? Math.max(0, parseNum(els.newServicePrice.value)) : 0;
-
+            const name = els.newServiceName ? els.newServiceName.value.trim() : "";
+            const price = parseNum(els.newServicePrice ? els.newServicePrice.value : 0);
             if (!name) {
-              showToast("Введите название услуги", "warn");
+              showToast("Введите название услуги или расходника", "warn");
               if (els.newServiceName) els.newServiceName.focus();
               return;
             }
-
-            const newSrv = {
-              id: "srv_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+            const newItem = {
+              id: `srv_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
               name,
-              price
+              price: Math.max(0, price)
             };
-
-            state.services = [...getServicesList(), newSrv];
-            state.selectedServiceId = newSrv.id;
+            state.services.push(newItem);
+            state.selectedServiceId = newItem.id;
             if (els.newServiceName) els.newServiceName.value = "";
             if (els.newServicePrice) els.newServicePrice.value = "";
-            renderServicesControls();
+            syncPresetsWithServices();
             saveState();
-            showToast(`Услуга «${name}» добавлена`, "success");
-          });
-        }
-
-        if (els.servicesListView) {
-          els.servicesListView.addEventListener("click", (e) => {
-            const editBtn = e.target.closest("button[data-edit-srv-id]");
-            if (editBtn) {
-              editingServiceId = editBtn.dataset.editSrvId;
-              renderServicesControls();
-              const row = els.servicesListView.querySelector(`[data-edit-srv-row="${CSS.escape(editingServiceId)}"]`);
-              const nameInput = row ? row.querySelector("[data-edit-srv-name]") : null;
-              if (nameInput) nameInput.focus();
-              return;
-            }
-
-            const cancelBtn = e.target.closest("button[data-cancel-srv-id]");
-            if (cancelBtn) {
-              editingServiceId = null;
-              renderServicesControls();
-              return;
-            }
-
-            const saveBtn = e.target.closest("button[data-save-srv-id]");
-            if (saveBtn) {
-              const id = saveBtn.dataset.saveSrvId;
-              const row = els.servicesListView.querySelector(`[data-edit-srv-row="${CSS.escape(id)}"]`);
-              const nameInput = row ? row.querySelector("[data-edit-srv-name]") : null;
-              const priceInput = row ? row.querySelector("[data-edit-srv-price]") : null;
-              const updatedName = nameInput ? nameInput.value.trim() : "";
-              const updatedPrice = priceInput ? Math.max(0, parseNum(priceInput.value)) : 0;
-
-              if (!updatedName) {
-                showToast("Введите название услуги", "warn");
-                if (nameInput) nameInput.focus();
-                return;
-              }
-
-              state.services = getServicesList().map((s) =>
-                s.id === id ? { ...s, name: updatedName, price: updatedPrice } : s
-              );
-              editingServiceId = null;
-              renderServicesControls();
-              saveState();
-              showToast(`Услуга «${updatedName}» обновлена`, "success");
-              return;
-            }
-
-            const delBtn = e.target.closest("button[data-delete-srv-id]");
-            if (!delBtn) return;
-            const currentList = getServicesList();
-            if (currentList.length <= 1) {
-              showToast("Должна остаться хотя бы одна услуга", "warn");
-              return;
-            }
-            const id = delBtn.dataset.deleteSrvId;
-            if (editingServiceId === id) {
-              editingServiceId = null;
-            }
-            state.services = currentList.filter((s) => s.id !== id);
-            if (!state.services.some((s) => s.id === state.selectedServiceId)) {
-              state.selectedServiceId = state.services[0].id;
-            }
-            renderServicesControls();
-            saveState();
-            showToast("Услуга удалена", "info");
+            renderServicesSettings();
+            renderPresetsSettings();
+            renderServiceSelector();
+            renderOneHandHelpers();
+            showToast(`Добавлено: ${name}`, "success");
           });
         }
 
         if (els.btnResetDefaultServices) {
           els.btnResetDefaultServices.addEventListener("click", () => {
-            editingServiceId = null;
             state.services = DEFAULT_SERVICES.map((s) => ({ ...s }));
             state.selectedServiceId = state.services[0].id;
-            renderServicesControls();
+            editingServiceId = null;
+            syncPresetsWithServices();
             saveState();
+            renderServicesSettings();
+            renderPresetsSettings();
+            renderServiceSelector();
+            renderOneHandHelpers();
             showToast("Список услуг сброшен по умолчанию", "info");
           });
         }
 
-        if (els.btnCopyReportTab) {
-          els.btnCopyReportTab.addEventListener("click", () => copyText(buildReportText(), "✓ Отчёт скопирован"));
-        }
+        if (els.servicesListView) {
+          els.servicesListView.addEventListener("click", (e) => {
+            const editBtn = e.target.closest(".edit-srv-btn");
+            if (editBtn) {
+              editingServiceId = editBtn.dataset.editSrvId;
+              renderServicesSettings();
+              return;
+            }
 
-        if (els.btnQuickCopy) {
-          els.btnQuickCopy.addEventListener("click", () => copyText(buildReportText(), "✓ Отчёт скопирован"));
-        }
+            const cancelBtn = e.target.closest(".cancel-srv-btn");
+            if (cancelBtn) {
+              editingServiceId = null;
+              renderServicesSettings();
+              return;
+            }
 
-        if (els.btnOpenTelegram) {
-          els.btnOpenTelegram.addEventListener("click", async () => {
-            const reportText = buildReportText();
-            await copyText(reportText, "✓ Скопировано и открывается Telegram");
-            window.location.href = "tg://msg?text=" + encodeURIComponent(reportText);
+            const saveBtn = e.target.closest(".save-srv-btn");
+            if (saveBtn) {
+              const srvId = saveBtn.dataset.saveSrvId;
+              const nameInput = els.servicesListView.querySelector(`[data-edit-srv-name="${CSS.escape(srvId)}"]`);
+              const priceInput = els.servicesListView.querySelector(`[data-edit-srv-price="${CSS.escape(srvId)}"]`);
+              const nextName = nameInput ? nameInput.value.trim() : "";
+              const nextPrice = Math.max(0, parseNum(priceInput ? priceInput.value : 0));
+              if (!nextName) {
+                showToast("Название не может быть пустым", "warn");
+                return;
+              }
+              state.services = getServicesList().map((s) =>
+                s.id === srvId ? { ...s, name: nextName, price: nextPrice } : s
+              );
+              editingServiceId = null;
+              syncPresetsWithServices();
+              saveState();
+              renderServicesSettings();
+              renderPresetsSettings();
+              renderServiceSelector();
+              renderOneHandHelpers();
+              showToast("Услуга обновлена", "success");
+              return;
+            }
+
+            const delBtn = e.target.closest(".del-srv-btn");
+            if (delBtn) {
+              const srvId = delBtn.dataset.delSrvId;
+              const currentList = getServicesList();
+              if (currentList.length <= 1) {
+                showToast("Должна остаться хотя бы одна позиция", "warn");
+                return;
+              }
+              state.services = currentList.filter((s) => s.id !== srvId);
+              if (state.selectedServiceId === srvId) {
+                state.selectedServiceId = state.services[0].id;
+              }
+              if (editingServiceId === srvId) {
+                editingServiceId = null;
+              }
+              saveState();
+              renderServicesSettings();
+              renderServiceSelector();
+              showToast("Позиция удалена", "warn");
+            }
           });
         }
+
+        if (els.addPresetForm) {
+          els.addPresetForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const label = els.newPresetLabel ? els.newPresetLabel.value.trim() : "";
+            const rawItems = els.newPresetItems ? els.newPresetItems.value : "";
+            const comment = els.newPresetComment ? els.newPresetComment.value.trim() : "";
+            const items = String(rawItems || "")
+              .split(/\r?\n/)
+              .map((line) => line.trim())
+              .filter(Boolean);
+
+            if (!label) {
+              showToast("Введите название кнопки шаблона", "warn");
+              if (els.newPresetLabel) els.newPresetLabel.focus();
+              return;
+            }
+            if (items.length === 0) {
+              showToast("Добавьте хотя бы одну позицию шаблона", "warn");
+              if (els.newPresetItems) els.newPresetItems.focus();
+              return;
+            }
+
+            const nextPresets = getPresetsList();
+            nextPresets.push({
+              id: `preset_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              label,
+              items,
+              comment
+            });
+            state.presets = nextPresets;
+            if (els.newPresetLabel) els.newPresetLabel.value = "";
+            if (els.newPresetItems) els.newPresetItems.value = "";
+            if (els.newPresetComment) els.newPresetComment.value = "";
+            syncPresetsWithServices();
+            saveState();
+            renderPresetsSettings();
+            renderOneHandHelpers();
+            showToast(`Шаблон «${label}» добавлен`, "success");
+          });
+        }
+
+        if (els.btnResetDefaultPresets) {
+          els.btnResetDefaultPresets.addEventListener("click", () => {
+            state.presets = DEFAULT_JOB_PRESETS.map((p) => ({ ...p, items: [...p.items] }));
+            editingPresetId = null;
+            syncPresetsWithServices();
+            saveState();
+            renderPresetsSettings();
+            renderOneHandHelpers();
+            showToast("Шаблоны заявок сброшены по умолчанию", "info");
+          });
+        }
+
+        if (els.presetsListView) {
+          els.presetsListView.addEventListener("click", (e) => {
+            const editBtn = e.target.closest(".edit-preset-btn");
+            if (editBtn) {
+              editingPresetId = editBtn.dataset.editPresetId;
+              renderPresetsSettings();
+              return;
+            }
+
+            const cancelBtn = e.target.closest(".cancel-preset-btn");
+            if (cancelBtn) {
+              editingPresetId = null;
+              renderPresetsSettings();
+              return;
+            }
+
+            const saveBtn = e.target.closest(".save-preset-btn");
+            if (saveBtn) {
+              const presetId = saveBtn.dataset.savePresetId;
+              const labelInput = els.presetsListView.querySelector(`[data-edit-preset-label="${CSS.escape(presetId)}"]`);
+              const itemsInput = els.presetsListView.querySelector(`[data-edit-preset-items="${CSS.escape(presetId)}"]`);
+              const commentInput = els.presetsListView.querySelector(`[data-edit-preset-comment="${CSS.escape(presetId)}"]`);
+              const nextLabel = labelInput ? labelInput.value.trim() : "";
+              const nextItems = String(itemsInput ? itemsInput.value : "")
+                .split(/\r?\n/)
+                .map((line) => line.trim())
+                .filter(Boolean);
+              const nextComment = commentInput ? commentInput.value.trim() : "";
+
+              if (!nextLabel) {
+                showToast("Название шаблона не может быть пустым", "warn");
+                return;
+              }
+              if (nextItems.length === 0) {
+                showToast("Добавьте хотя бы одну позицию шаблона", "warn");
+                return;
+              }
+
+              state.presets = getPresetsList().map((p) =>
+                p.id === presetId ? { ...p, label: nextLabel, items: nextItems, comment: nextComment } : p
+              );
+              editingPresetId = null;
+              syncPresetsWithServices();
+              saveState();
+              renderPresetsSettings();
+              renderOneHandHelpers();
+              showToast("Шаблон обновлён", "success");
+              return;
+            }
+
+            const delBtn = e.target.closest(".del-preset-btn");
+            if (delBtn) {
+              const presetId = delBtn.dataset.delPresetId;
+              state.presets = getPresetsList().filter((p) => p.id !== presetId);
+              if (editingPresetId === presetId) {
+                editingPresetId = null;
+              }
+              saveState();
+              renderPresetsSettings();
+              renderOneHandHelpers();
+              showToast("Шаблон удалён", "warn");
+            }
+          });
+        }
+
+        window.addEventListener("beforeinstallprompt", (e) => {
+          e.preventDefault();
+          deferredInstallPrompt = e;
+          updateInstallButtonVisibility();
+        });
+
+        window.addEventListener("appinstalled", () => {
+          deferredInstallPrompt = null;
+          if (els.btnInstallPwaHeader) {
+            els.btnInstallPwaHeader.classList.add("hidden");
+          }
+          showToast("Приложение установлено на главный экран", "success");
+        });
       }
 
-      try {
+      // Инициализирует приложение при загрузке страницы
+      function init() {
         setupPwaSupport();
         loadState();
+        if (syncPresetsWithServices()) {
+          saveState();
+        }
+        hydrateFormInputs();
         bindEvents();
-        renderShiftUI();
-        renderExtraFuelsUI();
-        renderServicesControls();
-        renderBotSettingsUI();
         renderJobsUI();
-        renderReportUI();
-        resizeJobDescBox();
-        resizeSelectedItemsBox();
-        updatePaymentCalculationPreview();
-        setActiveTab(state.activeTab || "jobs");
-      } catch (err) {
-        showToast("Ошибка инициализации интерфейса", "warn");
+        renderReport();
+        switchTab(state.activeTab || "jobs");
+        updateInstallButtonVisibility();
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
       }
     })();
   </script>
